@@ -4,7 +4,7 @@ make_genus_tree <- function (phytree,placement = placement,species = species) {
   species <- gsub(" ","_",species)
   
   genus.tree <- unique(unlist(lapply(strsplit(phytree$tip.label,"_"),function(x) x[[1]])))
-  
+  genus.tree <- paste0(genus.tree,"_")
   species.representative <- NULL
   
   for (i in 1:length(genus.tree)) {
