@@ -33,5 +33,8 @@ Otherwise, start from Script 3 and just load the clim_invasion_df.csv
 |match_bentity.csv| Some records are associated with names not mentioned in the Bentity2 system. We used this csv file to re-classify them. 
 |Native.csv| Native distributions of all ants from GABI (Guénard et al. 2017). Visit AntMaps (https://antmaps.org/) for the most updated information.
 
+# Figure
+The file "Figures" contains three cartoons for reproducing figures in the manuscript. These cartoons were obtained in Microsoft PowerPoint.
+
 # Contact
 Toby Tsang (paknok.tsang@utoronto.ca)
