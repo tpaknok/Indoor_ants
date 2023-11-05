@@ -3,8 +3,9 @@ How climatic conditions limit ants within indoor environments
 
 This repository contains all the scripts required to reproduce results in Tsang et al. (2024). 
 It also contains data to reproduce the results.
-Note that because of the size of the climatic raster, they were not uploaded to this repository. Readers can go to to https://www.climatologylab.org/terraclimate.html to download the data
-Nevertheless, all aggregated climatic data (e.g., average temperature in a region and within the native distribution of a species) have been provided
+Note that because of the size of the climatic raster, they were not uploaded to this repository. Readers can go to to https://www.climatologylab.org/terraclimate.html to download the data.
+
+Nevertheless, data extracted from Terraclimate have been provided, and readers can skip script 1 and 2 and directly run the analyses (clim_invasion_df.csv). 
 
 # Scripts
 |Scripts|Description|
