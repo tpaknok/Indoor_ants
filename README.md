@@ -18,7 +18,7 @@ Otherwise, start from Script 3 and just load the clim_invasion_df.csv
 |3_Indoor_and_Climate.R| Code for GLMM examining how climatic conditions determine indoor status. Also contain codes for Fig1, and all figures about alien and harmful ant richness.
 |4_Impact_analyses.R| Aggregating impact scores from Gruber et al. (2022), and projecting impact increases under climate change. Also contain codes for all figures about the impacts of ants.
 |5_Response_capacity.R| Response capacity analyses using data from Early et al. (2016). Also contain codes for figures about response capacitiy.
-|make_genus_tree.R| add missing genera to the phylogenetic tree obtained from Economo et al. (2018). Used in Script 2.
+|make_genus_tree.R| add missing genera to the phylogenetic tree obtained from Economo et al. (2018). Used in Script 3 for checking phylogenetic autocorrelation.
 
 # Data
 |Data|Description|
