@@ -99,7 +99,7 @@ pS2 <- ggplot(Global_impact,aes(label=n,y=Impact,x=Score,fill=Warming))+
 
 plot(pS2)
 
-ggsave("Figures/Total_impact.tiff",width=16,height=8,units="cm",dpi=600,compression="lzw")
+ggsave("Figures/FigS2.tiff",width=16,height=8,units="cm",dpi=600,compression="lzw")
 ### Sub-figures on impacts, including Figure 2, S1, S4
 bentity.shp.sf$proj_diff_impact_E_2C_net <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_E"])
 bentity.shp.sf$proj_diff_impact_E_4C_net<- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_E"])
@@ -144,7 +144,7 @@ plot(p1f)
 library(ggpubr)
 p1 <- ggarrange(p1a,p1b,p1c,p1d,p1e,p1f,hjust=0,vjust=0,label.x=0,label.y=0,nrow=3,ncol=2)
 plot(p1)
-ggsave("Figures/Fig1.tiff",dpi=800,compression="lzw",units="cm",height=9.5*1.5,width=16.8,bg="white")
+ggsave("Figures/FigS1.tiff",dpi=800,compression="lzw",units="cm",height=9.5*1.5,width=16.8,bg="white")
 
 ###
 
@@ -236,7 +236,7 @@ Species_summary_long$Warming <- factor(Species_summary_long$Warming,levels=c("4Â
 Species_summary_long$Type <- factor(Species_summary_long$Type,levels=c("Naturalization probablity","Environmental","Socioeconomic")) 
 Species_summary_long$species <- factor(Species_summary_long$species,levels= sort(unique(Species_summary_long$species),decreasing=T))
 
-pS2 <- ggplot(data=Species_summary_long,aes(y=species,x=value,fill=Warming))+
+pS3 <- ggplot(data=Species_summary_long,aes(y=species,x=value,fill=Warming))+
   geom_bar(stat="Identity",position="dodge")+
   facet_wrap(~Type,scale="free_x")+
   xlab("Cumulative increases across indoor populations under warming")+
@@ -254,7 +254,7 @@ pS2 <- ggplot(data=Species_summary_long,aes(y=species,x=value,fill=Warming))+
         legend.key.width = unit(0.5, "cm"),
         legend.title = element_text(size=6))
 plot(pS2)
-ggsave("Figures/FigS2.tiff",dpi=800,compression="lzw",units="cm",height=13.5,width=16.8,bg="white")
+ggsave("Figures/FigS3.tiff",dpi=800,compression="lzw",units="cm",height=13.5,width=16.8,bg="white")
 
 ###
 

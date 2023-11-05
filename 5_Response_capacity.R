@@ -100,7 +100,7 @@ pS6 <- ggplot(data=country_sf,aes(fill=total))+
 
 plot(pS6)
 
-ggsave("Figures/pS6.tiff",dpi=800,width=16,height=10,compression="lzw")
+ggsave("Figures/FigS6.tiff",dpi=800,width=16,height=10,compression="lzw")
 
 not_found <- bentity.shp.df$Final_country[!bentity.shp.df$Final_country %in% capacity$Country_global]
 not_found <- sort(unique(not_found)) #Bentity polygon not considered
@@ -138,7 +138,7 @@ na.omit(record_score) %>% group_by(name) %>% summarize(percent = value[total_sco
 
 record_score$name <- factor(record_score$name,levels=c("2°C Alien","4°C Alien", "2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic"))
 
-### Make FigS3
+### Make Fig3
 p3 <- ggplot(data=record_score)+
   geom_bar(aes(x=total_score,weight=value))+
   xlab("Total response capcity score (0-5)")+
@@ -248,8 +248,8 @@ for (num in 1:8){
 p4 <- ggarrange(p_cap_1,p_cap_2,p_cap_3,p_cap_4,p_cap_5,p_cap_6,p_cap_7,p_cap_8,nrow=4,ncol=2,common.legend=T,legend="bottom")
 plot(p4)
 
-ggsave("Figures/Fig5.tiff",dpi=800,width=16.8,height=24,units="cm",compression="lzw",bg="white")
-write.csv(prop_df,"Figures/prop.csv")
+ggsave("Figures/Fig4.tiff",dpi=800,width=16.8,height=24,units="cm",compression="lzw",bg="white")
+write.csv(prop_df,"Results/prop.csv")
 
 ### Summary statistics Table S4 (% of climate change effects on the top-10 / 20 countries)
 sum(country_score$`2°C Alien`[order(country_score$`2°C Alien`,decreasing=T)][1:10])/sum(country_score$`2°C Alien`)
