@@ -13,8 +13,8 @@ Nevertheless, data extracted from Terraclimate have been provided, and readers c
 |1_clim_raster.R| Used to process Terraclimate raster and generate PCA scores (based on climatic conditions) across grids globally. 
 |2_GABI_and_Climate| Data cleaning and obtaining climatic conditions in each region, and the native distribution of each species. Also forming the population-level data for analyses. 
 |3_Indoor_and_Climate.R| Code for GLMM examining how climatic conditions determine indoor status. Also contain codes for Fig1, and all figures about alien and harmful ant richness.
-|4_Impact_analyses.R| Aggregating impact scores from Gruber et al. (2022), and projection impact increases under climate change. Also contain codes for all figures about impacts of ants.
-|5_Response_capacity.R| Response capacity analyses using dataf rom Early et al. (2016). Also contain codes for Fig 3 and 4.
+|4_Impact_analyses.R| Aggregating impact scores from Gruber et al. (2022), and projecting impact increases under climate change. Also contain codes for all figures about the impacts of ants.
+|5_Response_capacity.R| Response capacity analyses using data from Early et al. (2016). Also contain codes for figures about response capacitiy.
 |make_genus_tree.R| add missing genera to the phylogenetic tree obtained from Economo et al. (2018). Used in Script 2.
 
 # Data
