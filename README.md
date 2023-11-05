@@ -8,6 +8,9 @@ Note that because of the size of the climatic raster, they were not uploaded to 
 Nevertheless, data extracted from Terraclimate have been provided, and readers can skip script 1 and 2 and directly run the analyses (clim_invasion_df.csv). 
 
 # Scripts
+Please run these sequentially. If you want to start from the scratch, pick Script 1 (and download Terraclimate rasters, as described in the scripts).
+Otherwise, start from Script 3 and just load the clim_invasion_df.csv
+
 |Scripts|Description|
 |---|---|
 |1_clim_raster.R| Used to process Terraclimate raster and generate PCA scores (based on climatic conditions) across grids globally. 
