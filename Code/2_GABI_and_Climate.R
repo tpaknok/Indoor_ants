@@ -44,6 +44,8 @@ set <- exotic.records %>%
   group_by(pop) %>%
   summarize(diff = Date[Improved.Classification == "Indoor Introduced"] - Date[Improved.Classification == "Exotic"])
 
+sum(set$diff < 0,na.rm=T) #number of indoor records precede the earliest outdoor records
+
 ### The number of indoor and outdoor records for each species
 status_count <- exotic.records %>% group_by(valid_species_name) %>% dplyr::count(Improved.Classification)
 status_count_wide <- status_count %>% pivot_wider(id_cols=valid_species_name,names_from=Improved.Classification,values_from=n)

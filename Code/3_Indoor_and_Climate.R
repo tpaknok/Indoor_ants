@@ -1,4 +1,4 @@
-source("make_genus_tree.R")
+source("Code/make_genus_tree.R")
 
 library(phytools)
 library(ape)
@@ -290,7 +290,7 @@ theme <- theme(axis.line=element_blank(),
 
 p1a <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr))+
   geom_sf(colour="black",size=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Alien",size=size)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)+
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -302,7 +302,7 @@ plot(p1a)
 
 p1b <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr))+
   geom_sf(colour="black",size=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Alien",size=size)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Non-native",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -352,7 +352,7 @@ space <- 900000
 size <- 2.7
 p2a <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Alien",size=size)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -364,7 +364,7 @@ plot(p2a)
 
 p2b <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Alien",size=size)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Non-native",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -401,7 +401,7 @@ plot(p2d)
 ###Fig S4a-b
 pS4a <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_indoor_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Alien",size=size)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+

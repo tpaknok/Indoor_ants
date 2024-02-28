@@ -124,8 +124,8 @@ sp_country <- NMI_analysis %>% group_by(species,Final_country,Harmful,total_scor
                                                                                                                        Impact_4C.S.Total = max(Impact_4C.S.Total))
 
 ### Distribution of climate change effects along different response capacities
-record_score <- sp_country %>% group_by(total_score) %>% summarise("2°C Alien" = sum(proj_diff_2C),
-                                                                   "4°C Alien" = sum(proj_diff_4C),
+record_score <- sp_country %>% group_by(total_score) %>% summarise("2°C Non-native" = sum(proj_diff_2C),
+                                                                   "4°C Non-native" = sum(proj_diff_4C),
                                                                    "2°C Harmful" = sum(proj_diff_2C[Harmful == "Harmful"]),
                                                                    "4°C Harmful" = sum(proj_diff_4C[Harmful=="Harmful"]),
                                                                    "2°C Environmental" = sum(Impact_2C.E.Total),
@@ -136,7 +136,7 @@ record_score <- sp_country %>% group_by(total_score) %>% summarise("2°C Alien" 
 record_score <- record_score %>% pivot_longer(!total_score)
 na.omit(record_score) %>% group_by(name) %>% summarize(percent = value[total_score==5]/sum(value)*100)
 
-record_score$name <- factor(record_score$name,levels=c("2°C Alien","4°C Alien", "2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic"))
+record_score$name <- factor(record_score$name,levels=c("2°C Non-native","4°C Non-native", "2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic"))
 
 ### Make Fig3
 p3 <- ggplot(data=record_score)+
@@ -152,8 +152,8 @@ plot(p3)
 ggsave("Figures/Fig3.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
 
 ### Make FigS5 (Country level variations - given the same response capacities)
-country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% summarise("2°C Alien" = sum(proj_diff_2C),
-                                                                           "4°C Alien" = sum(proj_diff_4C),
+country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% summarise("2°C Non-native" = sum(proj_diff_2C),
+                                                                           "4°C Non-native" = sum(proj_diff_4C),
                                                                            "2°C Harmful" = sum(proj_diff_2C[Harmful == "Harmful"]),
                                                                            "4°C Harmful" = sum(proj_diff_4C[Harmful=="Harmful"]),
                                                                            "2°C Environmental" = sum(Impact_2C.E.Total),
@@ -162,10 +162,10 @@ country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% s
                                                                            "4°C Socioeconomic" = sum(Impact_4C.S.Total))
 
 sum_stat <- country_record_score %>% group_by(total_score) %>% summarise(n= n(),
-                                                                   mean_2C_alien = mean(`2°C Alien`),
-                                                                   sd_2C_alien = sd(`2°C Alien`),
-                                                                   mean_4C_alien = mean(`4°C Alien`),
-                                                                   sd_4C_alien = sd(`4°C Alien`),
+                                                                   mean_2C_alien = mean(`2°C Non-native`),
+                                                                   sd_2C_alien = sd(`2°C Non-native`),
+                                                                   mean_4C_alien = mean(`4°C Non-native`),
+                                                                   sd_4C_alien = sd(`4°C Non-native`),
                                                                    mean_2C_harmful = mean(`2°C Harmful`),
                                                                    sd_2C_harmful = sd(`2°C Harmful`),
                                                                    mean_4C_harmful = mean(`4°C Harmful`),
@@ -182,7 +182,7 @@ sum_stat <- country_record_score %>% group_by(total_score) %>% summarise(n= n(),
 
 
 country_record_score_long <- na.omit(country_record_score) %>% pivot_longer(cols=-c(Final_country,total_score),names_to="scenario")
-country_record_score_long$scenario <- factor(country_record_score_long$scenario,levels=c("2°C Alien","4°C Alien", "2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic"))
+country_record_score_long$scenario <- factor(country_record_score_long$scenario,levels=c("2°C Non-native","4°C Non-native", "2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic"))
 
 pS5 <- ggplot(data=country_record_score_long)+
   geom_boxplot(aes(x=total_score,y=value,group=total_score))+
@@ -197,8 +197,8 @@ plot(pS5)
 ggsave("Figures/FigS5.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
 
 ### figure 4
-country_score <- sp_country %>% group_by(Final_country) %>% summarise("2°C Alien" = sum(proj_diff_2C),
-                                                                      "4°C Alien" = sum(proj_diff_4C),
+country_score <- sp_country %>% group_by(Final_country) %>% summarise("2°C Non-native" = sum(proj_diff_2C),
+                                                                      "4°C Non-native" = sum(proj_diff_4C),
                                                                       "2°C Harmful" = sum(proj_diff_2C[Harmful == "Harmful"]),
                                                                       "4°C Harmful" = sum(proj_diff_4C[Harmful=="Harmful"]),
                                                                       "2°C Environmental" = sum(Impact_2C.E.Total),
@@ -207,7 +207,7 @@ country_score <- sp_country %>% group_by(Final_country) %>% summarise("2°C Alie
                                                                       "4°C Socioeconomic" = sum(Impact_4C.S.Total))
 
 country_score <- cbind(country_score,capacity[match(country_score$Final_country,capacity$Country_global),c("threat","IAS_list","Existing_mgmt","research","outreach")])
-var = c("2°C Alien","4°C Alien","2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic")
+var = c("2°C Non-native","4°C Non-native","2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic")
 top_n <- 20
 country_score <- na.omit(country_score)
 country_score$Final_country[country_score$Final_country == "Dem. Rep. Korea"] <- "North Korea" #change name
@@ -252,10 +252,10 @@ ggsave("Figures/Fig4.tiff",dpi=800,width=16.8,height=24,units="cm",compression="
 write.csv(prop_df,"Results/prop.csv")
 
 ### Summary statistics Table S4 (% of climate change effects on the top-10 / 20 countries)
-sum(country_score$`2°C Alien`[order(country_score$`2°C Alien`,decreasing=T)][1:10])/sum(country_score$`2°C Alien`)
-sum(country_score$`2°C Alien`[order(country_score$`2°C Alien`,decreasing=T)][1:20])/sum(country_score$`2°C Alien`)
-sum(country_score$`4°C Alien`[order(country_score$`4°C Alien`,decreasing=T)][1:10])/sum(country_score$`4°C Alien`)
-sum(country_score$`4°C Alien`[order(country_score$`4°C Alien`,decreasing=T)][1:20])/sum(country_score$`4°C Alien`)
+sum(country_score$`2°C Non-native`[order(country_score$`2°C Non-native`,decreasing=T)][1:10])/sum(country_score$`2°C Non-native`)
+sum(country_score$`2°C Non-native`[order(country_score$`2°C Non-native`,decreasing=T)][1:20])/sum(country_score$`2°C Non-native`)
+sum(country_score$`4°C Non-native`[order(country_score$`4°C Non-native`,decreasing=T)][1:10])/sum(country_score$`4°C Non-native`)
+sum(country_score$`4°C Non-native`[order(country_score$`4°C Non-native`,decreasing=T)][1:20])/sum(country_score$`4°C Non-native`)
 sum(country_score$`2°C Harmful`[order(country_score$`2°C Harmful`,decreasing=T)][1:10])/sum(country_score$`2°C Harmful`)
 sum(country_score$`2°C Harmful`[order(country_score$`2°C Harmful`,decreasing=T)][1:20])/sum(country_score$`2°C Harmful`)
 sum(country_score$`4°C Harmful`[order(country_score$`4°C Harmful`,decreasing=T)][1:10])/sum(country_score$`4°C Harmful`)
