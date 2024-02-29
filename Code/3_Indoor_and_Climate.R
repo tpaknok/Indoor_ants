@@ -38,12 +38,13 @@ options(glmmTMB.cores=6)
 
 library(glmmTMB)
 
-m1 <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca+temp_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
+m1 <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
              data=NMI_analysis,family="binomial") # model convergence issue
 summary(m1)
 
 m1a <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
-               data=NMI_analysis,family="binomial") #converged. Note no changes in everything, it seems.
+               data=NMI_analysis,family="binomial") #converged. Note no changes in everything
+car::Anova(m1a)
 summary(m1a) #removed one random effect as it is too weak and affect the calculation of R2. 
 performance::r2(m1a)
 
@@ -51,52 +52,60 @@ performance::r2(m1a)
 m1_simplified <- glmmTMB(num~water_pca+mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
                data=NMI_analysis,family="binomial") 
 summary(m1_simplified)
+car::Anova(m1_simplified)
 performance::r2(m1_simplified)
 
 #final model
-m <- glmmTMB(num~temp_pca*mean_temp_pca_native+(temp_pca||species)+(mean_temp_pca_native||polygon_name),
+m <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
              data=NMI_analysis,family="binomial")
+car::Anova(m)
 summary(m)
-r2(m)
+performance::r2(m)
 
 #see coef, and if there is any sign of quasi-separation...for final model only
 m_standardized <- glmmTMB(num~scale(temp_pca)*scale(mean_temp_pca_native)+(scale(temp_pca)||species)+(scale(mean_temp_pca_native)||polygon_name),
                           data=NMI_analysis,family="binomial")
 summary(m_standardized)
 
-write.csv(rbind(round(summary(m1)$coef$cond,3),round(summary(m1_simplified)$coef$cond,3),round(summary(m)$coef$cond,3)),"Results/glmm.csv")
+write.csv(rbind(round(car::Anova(m1a),3),round(car::Anova(m1_simplified),3),round(car::Anova(m),3)),"Results/glmm.csv")
 
 ### sensitivity testing (removed weak random effects such that performance::r2 runs - other results (e.g. p values) won't change)
 ### exclude reginos with zero indoor population
 region_name <- NMI_analysis_sum[NMI_analysis_sum$indoor > 0,"polygon_name"] 
-m1b <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
+m1b <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
                data=NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,],family="binomial") #subsetted analysis
 nrow(NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,])
+car::Anova(m1b)
 summary(m1b)
 performance::r2(m1b)
 
 ### exclude regions with <= 1 indoor population
 region_name <- NMI_analysis_sum[NMI_analysis_sum$indoor > 1,"polygon_name"]
-m1c <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(temp_pca+water_pca||species)+(0+mean_water_pca_native+mean_temp_pca_native||polygon_name),
+m1c <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
                data=NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,],family="binomial") #subsetted analysis
 nrow(NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,])
+car::Anova(m1c)
 summary(m1c)
 performance::r2(m1c)
 
 ### exclude regions with <= 2 indoor population
 region_name <- NMI_analysis_sum[NMI_analysis_sum$indoor > 2,"polygon_name"]
-m1d <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(temp_pca||species)+(0+mean_water_pca_native+mean_temp_pca_native||polygon_name),
+m1d <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
                data=NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,],family="binomial") #subsetted analysis
 nrow(NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,])
 summary(m1d)
+car::Anova(m1d)
+
 performance::r2(m1d)
 
-write.csv(rbind(round(summary(m1b)$coef$cond,3),round(summary(m1c)$coef$cond,3),round(summary(m1d)$coef$cond,3)),"Results/glmm_additional.csv")
+write.csv(rbind(round(car::Anova(m1b),3),
+                round(car::Anova(m1c),3),
+                round(car::Anova(m1d),3)),"Results/glmm_additional.csv")
 
 ### Check spatial autocorrelations
 library(DHARMa)
 library(geosphere)
-m_best1 <- glmmTMB(num~temp_pca*mean_temp_pca_native+(temp_pca||species)+(mean_temp_pca_native||polygon_name),
+m_best1 <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
              data=NMI_analysis[order(NMI_analysis$polygon_name),],family="binomial") #re-run model but make sure the factors are ordered alphabetically
 summary(m_best1)
 
@@ -108,7 +117,7 @@ polygon_dist <- distm(polygon_unique[,c("x","y")])
 testSpatialAutocorrelation(sres_spatial,distMat=polygon_dist) #results significant, but very low observed values
 
 ### Check phylogenetic correlations
-m_best2 <- glmmTMB(num~temp_pca*mean_temp_pca_native+(temp_pca||species)+(mean_temp_pca_native||polygon_name),
+m_best2 <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
               data=NMI_analysis[order(NMI_analysis$species),],family="binomial")
 summary(m_best2) #re-run model but make sure the factors are ordered alphabetically
 sres <- simulateResiduals(m_best2)

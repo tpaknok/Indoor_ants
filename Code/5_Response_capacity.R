@@ -251,7 +251,7 @@ plot(p4)
 ggsave("Figures/Fig4.tiff",dpi=800,width=16.8,height=24,units="cm",compression="lzw",bg="white")
 write.csv(prop_df,"Results/prop.csv")
 
-### Summary statistics Table S4 (% of climate change effects on the top-10 / 20 countries)
+### Summary statistics Table S5 (% of climate change effects on the top-10 / 20 countries)
 sum(country_score$`2°C Non-native`[order(country_score$`2°C Non-native`,decreasing=T)][1:10])/sum(country_score$`2°C Non-native`)
 sum(country_score$`2°C Non-native`[order(country_score$`2°C Non-native`,decreasing=T)][1:20])/sum(country_score$`2°C Non-native`)
 sum(country_score$`4°C Non-native`[order(country_score$`4°C Non-native`,decreasing=T)][1:10])/sum(country_score$`4°C Non-native`)
