@@ -191,6 +191,9 @@ NMI_analysis$proj_diff_2C <- NMI_analysis$future_status_2C-NMI_analysis$current_
 NMI_analysis$proj_diff_4C <- NMI_analysis$future_status_4C-NMI_analysis$current_status_projection
 NMI_analysis$warming_diff <- NMI_analysis$future_status_4C-NMI_analysis$future_status_2C
 
+NMI_analysis %>% 
+  filter(num == 0) %>% 
+  summarize(mean(proj_diff_2C),mean(proj_diff_4C),min(proj_diff_2C),max(proj_diff_2C),min(proj_diff_4C),max(proj_diff_4C)) #summary statisticsf for probabilities at population levels
 ### summary statistics per polygon
 site_summary <- NMI_analysis %>% group_by(polygon_name,ID) %>% summarize(current_sum = sum(num),
                                                                          current_indoor = sum(dummy[Status == "Indoor"]),
@@ -232,15 +235,27 @@ site_summary[is.na(site_summary)] <- 0
 ### Global average gain (%) in alien / harmful species richness
 ### have to mean them first rather than calculating percent change in each region before averaging - because some regions have inf values (0 harmful species currently at outdoor)
 
-site_summary %>% filter(current_indoor >0) %>% summarise(percent_2C = mean(proj_diff_indoor_2C_net)/mean(current_sum)*100,
-                                                         percent_4C = mean(proj_diff_indoor_4C_net)/mean(current_sum)*100,
-                                                         gain_2C = mean(proj_diff_indoor_2C_net),
-                                                         gain_4C = mean(proj_diff_indoor_4C_net))
+site_summary %>% 
+  filter(current_indoor >0) %>% 
+  summarise(percent_2C = mean(proj_diff_indoor_2C_net)/mean(current_sum)*100,
+            percent_4C = mean(proj_diff_indoor_4C_net)/mean(current_sum)*100,
+            gain_2C = mean(proj_diff_indoor_2C_net),
+            gain_4C = mean(proj_diff_indoor_4C_net),
+            gain_2C_min = min(proj_diff_indoor_2C_net),
+            gain_4C_min = min(proj_diff_indoor_4C_net),
+            gain_2C_max = max(proj_diff_indoor_2C_net),
+            gain_4C_max = max(proj_diff_indoor_4C_net))
 
-site_summary %>% filter(current_indoor_Harmful >0) %>% summarise(percent_2C_Harmful = mean(proj_diff_Harmful_indoor_2C_net)/mean(current_Harmful)*100,
-                                                                  percent_4C_Harmful = mean(proj_diff_Harmful_indoor_4C_net)/mean(current_Harmful)*100,
-                                                                  gain_2C_Harmful = mean(proj_diff_Harmful_indoor_2C_net),
-                                                                  gain_4C_Harmful = mean(proj_diff_Harmful_indoor_4C_net)) 
+site_summary %>% 
+  filter(current_indoor_Harmful >0) %>% 
+  summarise(percent_2C_Harmful = mean(proj_diff_Harmful_indoor_2C_net)/mean(current_Harmful)*100,
+            percent_4C_Harmful = mean(proj_diff_Harmful_indoor_4C_net)/mean(current_Harmful)*100,
+            gain_2C_Harmful = mean(proj_diff_Harmful_indoor_2C_net),
+            gain_4C_Harmful = mean(proj_diff_Harmful_indoor_4C_net),
+            gain_2C_Harmful_min = min(proj_diff_Harmful_indoor_2C_net),
+            gain_4C_Harmful_min = min(proj_diff_Harmful_indoor_4C_net),
+            gain_2C_Harmful_max = max(proj_diff_Harmful_indoor_2C_net),
+            gain_4C_Harmful_max = max(proj_diff_Harmful_indoor_4C_net)) 
 
 cor(site_summary$current_sum,site_summary$current_indoor,method="kendall") #correlation between indoor & outdoor alien richness based on current climate (observed)
 

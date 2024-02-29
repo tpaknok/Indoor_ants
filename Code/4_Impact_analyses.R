@@ -41,16 +41,24 @@ site_impact_summary <- NMI_analysis %>% group_by(polygon_name,ID) %>% summarize(
                                                                                 impact_increase_4C_S = impact_total_4C_S/impact_total_current_S*100,
                                                                                 current_Harmful_indoor = sum(dummy[Harmful=="Harmful" & num == 0])) %>% filter(current_Harmful_indoor > 0)
 
-site_impact_summary$impact_perc_4C_E <- site_impact_summary$impact_total_4C_E/site_impact_summary$impact_total_current_E*100 
-site_impact_summary$impact_perc_2C_E <- site_impact_summary$impact_total_2C_E/site_impact_summary$impact_total_current_E*100 
-site_impact_summary$impact_perc_4C_S <- site_impact_summary$impact_total_4C_S/site_impact_summary$impact_total_current_S*100 
-site_impact_summary$impact_perc_2C_S <- site_impact_summary$impact_total_2C_S/site_impact_summary$impact_total_current_S*100 
 
 mean(site_impact_summary$impact_total_2C_E)/mean(site_impact_summary$impact_total_current_E)*100 #percentage gain in E_score in 2C scenario
 mean(site_impact_summary$impact_total_4C_E)/mean(site_impact_summary$impact_total_current_E)*100 #percentage gain in E_score in 4C scenario
+mean(site_impact_summary$impact_total_2C_E)
+mean(site_impact_summary$impact_total_4C_E)
+min(site_impact_summary$impact_total_2C_E)
+min(site_impact_summary$impact_total_4C_E)
+max(site_impact_summary$impact_total_2C_E)
+max(site_impact_summary$impact_total_4C_E)
 
 mean(site_impact_summary$impact_total_2C_S)/mean(site_impact_summary$impact_total_current_S)*100 #percentage gain in S_score in 2C scenario
 mean(site_impact_summary$impact_total_4C_S)/mean(site_impact_summary$impact_total_current_S)*100 #percentage gain in S_score in 4C scenario
+mean(site_impact_summary$impact_total_2C_S)
+mean(site_impact_summary$impact_total_4C_S)
+min(site_impact_summary$impact_total_2C_S)
+min(site_impact_summary$impact_total_4C_S)
+max(site_impact_summary$impact_total_2C_S)
+max(site_impact_summary$impact_total_4C_S)
 
 ### Figure S2
 Global_impact <- as_tibble(data.frame(polygon_name=NMI_analysis$polygon_name,num=NMI_analysis$num,Harmful=NMI_analysis$Harmful,warm.4C=NMI_analysis$proj_diff_4C*Score_analysis,warm.2C=NMI_analysis$proj_diff_2C*Score_analysis)) %>%
