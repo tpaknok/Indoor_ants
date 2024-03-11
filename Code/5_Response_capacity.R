@@ -238,7 +238,7 @@ for (num in 1:8){
                                        ylab("")+
                                        xlab("")+
                                        labs(fill="Score")+
-                                       scale_fill_manual(values=c("#ffffb2","#fd8d3c","#bd0026"))+
+                                       scale_fill_manual(values=c("#bd0026","#fd8d3c","#ffffb2"))+
                                        ggtitle(var[[num]])+
                                        theme_classic()+
                                        theme(axis.text.x = if(num==1){element_text(angle = 10,size=7)}else{element_text(angle=10,colour = "white",size=8)},

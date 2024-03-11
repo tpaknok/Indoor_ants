@@ -38,9 +38,10 @@ options(glmmTMB.cores=6)
 
 library(glmmTMB)
 
-m1 <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
-             data=NMI_analysis,family="binomial") # model convergence issue
+m1 <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca+temp_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
+             data=NMI_analysis,family="binomial") # model does converge. but note the very low random effect variance of temp_pca.
 summary(m1)
+performance::r2(m1) #singularity!
 
 m1a <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log10(date)+sp.layer+(water_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
                data=NMI_analysis,family="binomial") #converged. Note no changes in everything
@@ -136,8 +137,8 @@ predict_niche$group <- as.numeric(as.character(predict_niche$group))
 NMI_analysis$Status <- ifelse(NMI_analysis$num == 0, "Indoor", "Naturalized")
 
 theme <- theme(axis.line=element_line(colour="black"),
-               axis.text = element_text(size=4.5),
-               axis.title = element_text(size=4.5),
+               axis.text = element_text(size=6),
+               axis.title = element_text(size=6),
                legend.position="bottom",
                panel.background=element_rect(colour="white",fill="white"),
                panel.grid.major=element_blank(),
@@ -145,8 +146,8 @@ theme <- theme(axis.line=element_line(colour="black"),
                plot.background=element_rect(colour="white",fill="white"),
                legend.key.height = unit(0.25, "cm"),
                legend.key.width = unit(0.3, "cm"),
-               legend.title= element_text(size=4.5),
-               legend.text = element_text(size=4.5),
+               legend.title= element_text(size=6),
+               legend.text = element_text(size=6),
                legend.margin=margin(t=0.2,unit="cm"))
 
 p1<- ggplot(predict_niche,aes(y=group,x=x))+

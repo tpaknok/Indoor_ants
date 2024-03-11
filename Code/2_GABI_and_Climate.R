@@ -41,9 +41,10 @@ set <- exotic.records %>%
   arrange(Date) %>% 
   slice(1L) %>%
   ungroup() %>%
-  group_by(pop) %>%
+  group_by(pop,valid_species_name,bentity2_name) %>%
   summarize(diff = Date[Improved.Classification == "Indoor Introduced"] - Date[Improved.Classification == "Exotic"])
 
+unique(set$valid_species_name)
 sum(set$diff < 0,na.rm=T) #number of indoor records precede the earliest outdoor records
 
 ### The number of indoor and outdoor records for each species
