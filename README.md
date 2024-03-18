@@ -7,7 +7,10 @@ Note that because of the size of the climatic raster, they were not uploaded to 
 
 Nevertheless, data extracted from Terraclimate have been provided, and readers can skip script 1 and 2 and directly run the analyses (clim_invasion_df.csv). 
 
-# Scripts
+# Figures
+For climate change forecast, see fig2.tiff in the Figure folder. Alternatively, read the indoor_ant_combined.pdf for all figures
+
+# Code
 Please run these sequentially. If you want to start from the scratch, pick Script 1 (and download Terraclimate rasters, as described in the scripts).
 Otherwise, start from Script 3 and just load the clim_invasion_df.csv
 
@@ -32,9 +35,6 @@ Otherwise, start from Script 3 and just load the clim_invasion_df.csv
 |GISS.csv| Impact scores of each species obtained from Gruber et al. (2022). We added a column "Health_type" categorizing if the health impacts are only associated with ant attacking people. Non-attack records were excluded from the analyses.
 |match_bentity.csv| Some records are associated with names not mentioned in the Bentity2 system. We used this csv file to re-classify them. 
 |Native.csv| Native distributions of all ants from GABI (Guénard et al. 2017). Visit AntMaps (https://antmaps.org/) for the most updated information.
-
-# Figure
-The file "Figures" contains the figures listed in the manuscript.
 
 # Contact
 Toby Tsang (paknok.tsang@utoronto.ca)
