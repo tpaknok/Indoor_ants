@@ -34,7 +34,7 @@ Otherwise, start from Script 3 and just load the clim_invasion_df.csv
 |Native.csv| Native distributions of all ants from GABI (Guénard et al. 2017). Visit AntMaps (https://antmaps.org/) for the most updated information.
 
 # Figure
-The file "Figures" contains three cartoons for reproducing figures in the manuscript. These cartoons were obtained in Microsoft PowerPoint.
+The file "Figures" contains the figures listed in the manuscript.
 
 # Contact
 Toby Tsang (paknok.tsang@utoronto.ca)
