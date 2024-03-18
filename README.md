@@ -1,5 +1,5 @@
 # Indoor_ants
-How climatic conditions limit ants within indoor environments
+Forecasting how climate change facilitate invasion of ants and increase their impacts
 
 This repository contains all the scripts required to reproduce results in Tsang et al. (2024). 
 It also contains data to reproduce the results.
