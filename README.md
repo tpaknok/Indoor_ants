@@ -1,5 +1,4 @@
-# Indoor_ants
-Forecasting how climate change facilitate invasion of ants and increase their impacts
+# Forecasting how climate change facilitate invasion of ants and increase their impacts
 ![](readme_figure.jpg)
 Forecasting non-native ant richness in different regions under 4°C warming. Red regions include larger increases.
 
