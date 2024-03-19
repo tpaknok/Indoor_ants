@@ -1,13 +1,15 @@
 # Indoor_ants
 Forecasting how climate change facilitate invasion of ants and increase their impacts
+![](readme_figure.jpg)
+Forecasting non-native ant richness in different regions under 4°C warming. Red regions include larger increases.
 
+# Overview
 This repository contains all the scripts required to reproduce results in Tsang et al. (2024). 
 It also contains data to reproduce the results.
 Note that because of the size of the climatic raster, they were not uploaded to this repository. Readers can go to to https://www.climatologylab.org/terraclimate.html to download the data.
 
 Nevertheless, data extracted from Terraclimate have been provided, and readers can skip script 1 and 2 and directly run the analyses (clim_invasion_df.csv). 
 
-![Fig2.tiff](https://raw.githubusercontent.com/tpaknok/Indoor_ants/main/Figures/socioeconomy.tiff)
 # Code
 Please run these sequentially. If you want to start from the scratch, pick Script 1 (and download Terraclimate rasters, as described in the scripts).
 Otherwise, start from Script 3 and just load the clim_invasion_df.csv
