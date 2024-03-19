@@ -1,6 +1,6 @@
 # Forecasting how climate change facilitate invasion of ants and increase their impacts
 ![](readme_figure.jpg)
-Forecasting non-native ant richness in different regions under 4°C warming. Red regions include larger increases.
+Forecasting non-native ant richness in different regions under 4°C warming. Red regions indicate larger increases. White regions indicate no increase.
 
 # Overview
 This repository contains all the scripts required to reproduce results in Tsang et al. (2024). 
