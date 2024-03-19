@@ -7,7 +7,7 @@ Note that because of the size of the climatic raster, they were not uploaded to 
 
 Nevertheless, data extracted from Terraclimate have been provided, and readers can skip script 1 and 2 and directly run the analyses (clim_invasion_df.csv). 
 
-![Fig2.tiff](https://github.com/tpaknok/Indoor_ants/blob/8c68df08b3cdbc10c7d6caaf197ab1cc82515b78/Figures/Fig2.tiff)
+![Fig2.tiff](https://github.com/tpaknok/Indoor_ants/blob/main/Figures/Fig2.tiff)
 # Code
 Please run these sequentially. If you want to start from the scratch, pick Script 1 (and download Terraclimate rasters, as described in the scripts).
 Otherwise, start from Script 3 and just load the clim_invasion_df.csv
