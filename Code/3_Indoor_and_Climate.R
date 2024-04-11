@@ -176,17 +176,37 @@ predict_df <- NMI_analysis[,c("temp_pca_4C","water_pca_4C","mean_water_pca_nativ
 colnames(predict_df)[1:2] <- c("temp_pca","water_pca")
 NMI_analysis$future_status_4C <- predict(m,newdata=predict_df, type="response")
 
-Harmful <- c("Anoplolepis.custodiens","Anoplolepis.gracilipes","Azteca.sericeasur","Brachyponera.chinensis","Camponotus.conspicuus.zonatus","Cardiocondyla.wroughtonii","Cardiocondyla.emeryi",
-              "Formica.aquilonia","Formica.paralugubris",
-              "Lasius.neglectus","Linepithema.humile",
-              "Monomorium.floricola","Monomorium.monomorium","Monomorium.pharaonis","Myrmica.rubra",
-              "Nylanderia.bourbonica","Nylanderia.fulva", "Ochetellus.glaber",
-              "Plagiolepis.alluaudi","Paratrechina.longicornis","Pheidole.megacephala","Pheidole.radoszkowskii","Solenopsis.invicta",
-              "Solenopsis.geminata","Solenopsis.papuana","Solenopsis.richteri",
-              "Tapinoma.melanocephalum","Tapinoma.sessile","Technomyrmex.albipes","Technomyrmex.difficilis","Tetramorium.bicarinatum","Tetramorium.simillimum",
-              "Trichomyrmex.destructor","Wasmannia.auropunctata") #Lepisolota canescens & Nylanderia pubens excluded due to no impact record
+#############
+backup_NMI_analysis <- NMI_analysis
+GISS <- read.csv("Data/GISS.csv")
+GISS <- GISS[GISS$Health_type != "Indoor (Occurrence)" & GISS$Health_type != "Indoor (Pathogen)" & GISS$Health_type != "Outdoor (Occurrence)" & GISS$Health_type != "Outdoor (Pathogen)",]
+library(tidyverse)
 
-NMI_analysis$Harmful <- ifelse(NMI_analysis$species %in% Harmful,"Harmful","Alien")
+GISS[GISS == "NI"] <- NA
+GISS_long <- GISS %>% 
+  select(Species.name,Plants_score,Animals_score,Competition_score,Ecosystems_score,Diseases_score,Hybridization_score,Crops_score,Animal.production_score,Forestry_score,Infrastructure_score,Health_score,Social_score,
+         Plants_Confidence_level,Animals_Confidence_level,Competition_Confidence_level,Ecosystems_Confidence_level,Diseases_Confidence_level,Hybridization_Confidence_level,Crops_Confidence_level,Animal.production_Confidence_level,Forestry_Confidence_level,Infrastructure_Confidence_level,Health_Confidence_level,Social_Confidence_level) %>%
+  pivot_longer(!Species.name,names_to=c("Impact",".value"),names_sep="_") %>%
+  mutate(score_confidence = replace(score,Confidence < 2, 0)) %>%
+  group_by(Species.name,Impact) %>%
+  summarize(max.score = max(score_confidence,na.rm=T),
+            min.score = min(score_confidence,na.rm=T)) #Inf / -Inf = empty = 0
+
+GISS_long[GISS_long == "-Inf"] <- 0
+GISS_long[GISS_long == "Inf"] <- 0
+
+Impact_score <- GISS_long %>% select(-min.score) %>% pivot_wider(names_from=Impact,values_from=max.score)
+Impact_score$E.Total <- rowSums(Impact_score[,c("Plants","Animals","Competition","Hybridization","Diseases","Ecosystems")],na.rm=T)
+Impact_score$S.Total <- rowSums(Impact_score[,c("Crops","Health","Forestry","Infrastructure","Social","Health")],na.rm=T)
+
+Harmful <- Impact_score %>%
+  filter(E.Total > 0 | S.Total > 0) %>%
+  select(Species.name,E.Total,S.Total)
+###
+
+NMI_analysis$Harmful <- ifelse(gsub("\\."," ",NMI_analysis$species) %in% Harmful$Species.name,"Harmful","Alien")
+NMI_analysis$species[NMI_analysis$Harmful == "Harmful" & NMI_analysis$num == 0]
+unique(NMI_analysis$species[NMI_analysis$Harmful == "Harmful" & NMI_analysis$num == 0])
 
 NMI_analysis$proj_diff_2C <- NMI_analysis$future_status_2C-NMI_analysis$current_status_projection
 NMI_analysis$proj_diff_4C <- NMI_analysis$future_status_4C-NMI_analysis$current_status_projection
@@ -263,12 +283,11 @@ cor(site_summary$current_sum,site_summary$current_indoor,method="kendall") #corr
 ###Figure S1a-d (Species richness)
 library(ggplot2)
 
-clim_invasion_df$Harmful <- clim_invasion_df$species %in% gsub("_",".",Harmful)
-indoor.sr <- subset(clim_invasion_df,num==0) %>% group_by(ID,polygon_name) %>% count(num)
-indoor.sr.Harmful <- subset(clim_invasion_df, num == 0 & Harmful == T) %>% group_by(ID,polygon_name) %>% count(num)
+indoor.sr <- subset(NMI_analysis,num==0) %>% group_by(ID,polygon_name) %>% count(num)
+indoor.sr.Harmful <- subset(NMI_analysis, num == 0 & Harmful == "Harmful") %>% group_by(ID,polygon_name) %>% count(num)
 
-outdoor.sr <- subset(clim_invasion_df,num==1) %>% group_by(ID,polygon_name) %>% count(num)
-outdoor.sr.Harmful <- subset(clim_invasion_df, num == 1 & Harmful == T) %>% group_by(ID,polygon_name) %>% count(num)
+outdoor.sr <- subset(NMI_analysis,num==1) %>% group_by(ID,polygon_name) %>% count(num)
+outdoor.sr.Harmful <- subset(NMI_analysis, num == 1 & Harmful =="Harmful") %>% group_by(ID,polygon_name) %>% count(num)
 
 bentity.shp.sf <- sf::st_as_sf(bentity.shp)
 bentity.shp.sf$indoor.sr <- unlist(indoor.sr[match(bentity.shp$BENTITY2_N,indoor.sr$polygon_name),"n"])
@@ -342,7 +361,7 @@ p1c <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr.Harmful))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0.5,12.5),breaks=c(1,6,12))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0.5,8.5),breaks=c(1,4,8))+
   theme
 plot(p1c)
 
@@ -353,7 +372,7 @@ p1d <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr.Harmful))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0.5,12.5),breaks=c(1,6,12))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0.5,16.5),breaks=c(1,8,16))+
   theme
 
 ###Fig2a-d
@@ -407,7 +426,7 @@ p2c <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_2C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,2.01),breaks = c(0,0.5,1,1.5,2))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,1.5),breaks = c(0,0.5,1,1.5))+
   theme
 plot(p2c)
 
@@ -419,7 +438,7 @@ p2d <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_4C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,2.01),breaks = c(0,0.5,1,1.5,2))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,1.5),breaks = c(0,0.5,1,1.5))+
   theme
 plot(p2d)
 
@@ -432,7 +451,7 @@ pS4a <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_indoor_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,3.5),breaks = c(0,1,2,3,4))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,3.8),breaks = c(0,1,2,3,4))+
   theme
 plot(pS4a)
 
@@ -444,6 +463,6 @@ pS4b <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_Harmful_indoor_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,1.3),breaks = c(0,0.5,1))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,1.01),breaks = c(0,0.5,1))+
   theme
 plot(pS4b)

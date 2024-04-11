@@ -1,26 +1,4 @@
 ### Impact projections under climate change
-backup_NMI_analysis <- NMI_analysis
-GISS <- read.csv("Data/GISS.csv")
-GISS <- GISS[GISS$Health_type != "Indoor (Occurrence)" & GISS$Health_type != "Indoor (Pathogen)" & GISS$Health_type != "Outdoor (Occurrence)" & GISS$Health_type != "Outdoor (Pathogen)",]
-library(tidyverse)
-
-GISS[GISS == "NI"] <- NA
-GISS_long <- GISS %>% 
-              select(Species.name,Plants_score,Animals_score,Competition_score,Ecosystems_score,Diseases_score,Hybridization_score,Crops_score,Animal.production_score,Forestry_score,Infrastructure_score,Health_score,Social_score,
-                     Plants_Confidence_level,Animals_Confidence_level,Competition_Confidence_level,Ecosystems_Confidence_level,Diseases_Confidence_level,Hybridization_Confidence_level,Crops_Confidence_level,Animal.production_Confidence_level,Forestry_Confidence_level,Infrastructure_Confidence_level,Health_Confidence_level,Social_Confidence_level) %>%
-              pivot_longer(!Species.name,names_to=c("Impact",".value"),names_sep="_") %>%
-              mutate(score_confidence = replace(score,Confidence < 2, 0)) %>%
-              group_by(Species.name,Impact) %>%
-              summarize(max.score = max(score_confidence,na.rm=T),
-                        min.score = min(score_confidence,na.rm=T)) #Inf / -Inf = empty = 0
-              
-GISS_long[GISS_long == "-Inf"] <- 0
-GISS_long[GISS_long == "Inf"] <- 0
-
-Impact_score <- GISS_long %>% select(-min.score) %>% pivot_wider(names_from=Impact,values_from=max.score)
-Impact_score$E.Total <- rowSums(Impact_score[,c("Plants","Animals","Competition","Hybridization","Diseases","Ecosystems")],na.rm=T)
-Impact_score$S.Total <- rowSums(Impact_score[,c("Crops","Health","Forestry","Infrastructure","Social","Health")],na.rm=T)
-
 Score_analysis <- Impact_score[match(NMI_analysis$species,gsub(" ",".",Impact_score$Species.name)),-1]
 Score_analysis[is.na(Score_analysis)] <- 0
 
@@ -29,18 +7,19 @@ NMI_analysis$Impact_2C <- NMI_analysis$proj_diff_2C*Score_analysis
 NMI_analysis$Impact_current <- NMI_analysis$num*Score_analysis # num = 1 for naturalized species
 NMI_analysis <- do.call(cbind,NMI_analysis)
 
-site_impact_summary <- NMI_analysis %>% group_by(polygon_name,ID) %>% summarize(impact_total_current_E = sum(Impact_current.E.Total),
-                                                                                impact_total_2C_E = sum(Impact_2C.E.Total[num == 0]),
-                                                                                impact_total_4C_E = sum(Impact_4C.E.Total[num == 0]),
-                                                                                impact_increase_2C_E = impact_total_2C_E/impact_total_current_E*100,
-                                                                                impact_increase_4C_E = impact_total_4C_E/impact_total_current_E*100,
-                                                                                impact_total_current_S = sum(Impact_current.S.Total),
-                                                                                impact_total_2C_S = sum(Impact_2C.S.Total[num == 0]),
-                                                                                impact_total_4C_S = sum(Impact_4C.S.Total[num == 0]),
-                                                                                impact_increase_2C_S = impact_total_2C_S/impact_total_current_S*100,
-                                                                                impact_increase_4C_S = impact_total_4C_S/impact_total_current_S*100,
-                                                                                current_Harmful_indoor = sum(dummy[Harmful=="Harmful" & num == 0])) %>% filter(current_Harmful_indoor > 0)
-
+site_impact_summary <- NMI_analysis %>% 
+  group_by(polygon_name,ID) %>% 
+  summarize(impact_total_current_E = sum(Impact_current.E.Total,na.rm=T)[num=1],
+            impact_total_2C_E = sum(Impact_2C.E.Total[num == 0]),
+            impact_total_4C_E = sum(Impact_4C.E.Total[num == 0]),
+            impact_increase_2C_E = impact_total_2C_E/impact_total_current_E*100,
+            impact_increase_4C_E = impact_total_4C_E/impact_total_current_E*100,
+            impact_total_current_S = sum(Impact_current.S.Total)[num=1],
+            impact_total_2C_S = sum(Impact_2C.S.Total[num == 0]),
+            impact_total_4C_S = sum(Impact_4C.S.Total[num == 0]),
+            impact_increase_2C_S = impact_total_2C_S/impact_total_current_S*100,
+            impact_increase_4C_S = impact_total_4C_S/impact_total_current_S*100,
+            current_Harmful_indoor = sum(dummy[Harmful=="Harmful" & num == 0])) %>% filter(current_Harmful_indoor > 0)
 
 mean(site_impact_summary$impact_total_2C_E)/mean(site_impact_summary$impact_total_current_E)*100 #percentage gain in E_score in 2C scenario
 mean(site_impact_summary$impact_total_4C_E)/mean(site_impact_summary$impact_total_current_E)*100 #percentage gain in E_score in 4C scenario
