@@ -72,7 +72,7 @@ pS2 <- ggplot(Global_impact,aes(label=n,y=Impact,x=Score,fill=Warming))+
   scale_fill_manual(values=c("#bd0026","#feb24c"))+
   theme_classic()+
   facet_wrap(~Type,scales="free_y")+
-  xlim(0,106)+
+  xlim(0,112)+
   theme_bw()+
   theme(legend.position="bottom",
         axis.text.x=element_text(size=6),
