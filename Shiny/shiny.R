@@ -171,7 +171,7 @@ ui <-
              ),
              tabPanel("About",
                       h2("What is this?"),
-                      h4("This is a shiny app visualizign ecological forecasts on how climate change facilitate indoor non-native ants spreading outdoors (i.e., naturalization). A relevant manuscript has  been submitted"),
+                      h4("This is a shiny app visualizing ecological forecasts of how climate change facilitate indoor non-native ants spreading outdoors (i.e., naturalization). A relevant manuscript has  been submitted"),
                       h2("What do different columns and terms mean?"),
                       tableOutput("metadata"),
                       h2("What are the impacts?"),
@@ -180,6 +180,13 @@ ui <-
                          Note that we are forecasting ant impacts in outdoor environments. Thus we did not consider records indicating records in indoor environments.
                          This includes occurrences of non-native ants in residential buildings as a nuisance, or contaminating food in storage.
                          Thus some species have impact records in the Gruber et al. database, but they are not listed as harmful here."),
+                      h2("What are response capacities?"),
+                      h4("This is extracted from a study evaluating CBD reports by different countries/adminstrative areas in 2015.
+                         High response capacities indicate better invasive species management.
+                         Note that the study evaluated the resposne capacity of different countries / adminstrative arears but not regions.
+                         Thus, for example, all the states in the US have the same response capcities. 
+                         However, the US outlying islands are considered as different unit due to very different management.
+                         See the references listed below for details"),
                       h2("How reliable are the climate change forecasts?"),
                       h4("Our model has >90% accucracy predicting the status of each population under current climate.
                       Thus we assume it does a decent job predicting the future."),
