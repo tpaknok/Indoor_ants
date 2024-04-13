@@ -463,6 +463,6 @@ pS4b <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_Harmful_indoor_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,1.01),breaks = c(0,0.5,1))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.01,1.01),breaks = c(0,0.5,1))+
   theme
 plot(pS4b)

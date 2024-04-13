@@ -187,7 +187,7 @@ pS4c <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_E))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,8.2))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.01,8.4))+
   theme
 
 pS4d <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_S))+
@@ -198,7 +198,7 @@ pS4d <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_S))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,4.6))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.01,4.5))+
   theme
 
 p2 <- ggarrange(p2a,p2b,p2c,p2d,p2e,p2f,p2g,p2h,nrow=4,ncol=2)
