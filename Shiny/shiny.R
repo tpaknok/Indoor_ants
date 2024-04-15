@@ -9,12 +9,15 @@ library(leaflegend)
 library(sf)
 library(shinythemes)
 library(htmlTable)
-alldata <- read.csv("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/R/shiny/indoor_ant_analysis.csv")
+alldata <- read.csv("indoor_ant_analysis.csv")
+alldata$label <- paste0(alldata$species,"_",alldata$polygon_name)
+see <- alldata %>% group_by(label) %>% summarize(n=n()) %>% filter(n>1)
 alldata$Status <- as.factor(alldata$Status)
-bentity.shp.sf <- st_read("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/R/shiny/bentity_shp_sf.shp")
+#bentity.shp.sf <- st_read("bentity_shp_sf.shp")
+#bentity.shp.sf <- ms_simplify(bentity.shp.sf,keep=0.05)
 
+bentity.shp.sf <- st_read("simplified_bentity.shp")
 bentity.shp.sf$polygon_name <- bentity.shp.sf$BENTITY
-bentity.shp.sf <- ms_simplify(bentity.shp.sf,keep=0.1)
 bentity.shp.sf$id <- 1:nrow(bentity.shp.sf)
 bentity.shp.sf <- bentity.shp.sf %>% 
                     left_join(
@@ -144,10 +147,13 @@ ui <-
                                              "Record",
                                              choices=c("Indoor records only","Outdoor records only","All records"),
                                              multiple = F,
-                                             selected = "Indoor records only")
+                                             selected = "Indoor records only"),
+                          actionButton("reset_input","Remove map-click filter")
                         ),
                         mainPanel(
                           width=9,
+                          h6("Click polygon to view the data of specific region. 
+                             Re-click the region or click the 'remove map-click filter' button to remove the filter"),
                           leafletOutput("climate_map"),
                           fluidRow(
                             tabsetPanel(
@@ -241,14 +247,6 @@ ui <-
 #   )
   
 server <- function(input, output, session) {
-  # observe({
-  #   req(input$reset_input)
-  #   updateVirtualSelect(inputId= "Species", label="Species",selected = unique(alldata$species))
-  #   updateVirtualSelect("Region", "Region", selected = unique(alldata$polygon_name))
-  #   updateSliderInput(inputId="E.Impact", label="Environmental Impact", value = c(0,14))
-  #   updateSliderInput(inputId="S.Impact", label="Socioeconomic Impact", value = c(0,16))
-  # })
-  # 
   output$metadata <- renderTable(metadata)
   
   df <- reactive({
@@ -257,7 +255,7 @@ server <- function(input, output, session) {
       filter(polygon_name %in% input$Region) %>%
       filter((E.Total >= input$E.Impact[1] & E.Total <= input$E.Impact[2]) | Status == "Native") %>%
       filter((S.Total >= input$S.Impact[1] & S.Total <= input$S.Impact[2]) | Status == "Native")
-    # 
+
     # if(!is.null(input$Species)) {
     #   record_df <- record_df %>% filter(species %in% input$Species)
     # } else {
@@ -273,13 +271,13 @@ server <- function(input, output, session) {
   # output$Species_UI <- renderUI({
   #   virtualSelectInput("Species",
   #                      "Species",
-  #                      choices=list("Harmful" = unique(alldata()$species[alldata()$Harmful == "Harmful"]),
-  #                                   "Non-harmful" = unique(alldata()$species[alldata()$Harmful != "Harmful"])),
-  #                      selected = unique(alldata()$species),
+  #                      choices=list("Harmful" = unique(df()$species[df()$Harmful == "Harmful" & df()$Status != "Native"]),
+  #                                   "Non-harmful" = unique(df()$species[df()$Harmful != "Harmful" & df()$Status != "Native"])),
+  #                      selected = unique(df()$species[df()$Status != "Native"]),
   #                      search = T,
   #                      multiple = T)
   # })
-  #   
+
   
   df_map <- reactive({
     var_name <- switch(
@@ -399,13 +397,18 @@ server <- function(input, output, session) {
    })
    
   rv <- reactiveVal()
-  
+
   observeEvent(input$climate_map_shape_click, {
     if(!is.null(rv()) && rv() == input$climate_map_shape_click$id)
       rv(NULL)     # Reset filter
     else
       rv(input$climate_map_shape_click$id)
     })
+  
+   observe({
+     req(input$reset_input)
+     rv(NULL)
+   })
   
   region_df <-reactive({
       if(is.null(rv())) { 
@@ -442,7 +445,7 @@ server <- function(input, output, session) {
       options = list(
         paging=TRUE,
         dom = 'ftpB',
-        buttons = c('copy', 'csv', 'excel')
+        buttons = list('copy', 'csv', 'excel')
       ),
       class = "display"
     )
