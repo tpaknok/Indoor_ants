@@ -73,7 +73,8 @@ css <- '.nav-tabs>li>a {
   color: black;
 }'
 
-metadata <- data.frame(Variable=c("Species",
+metadata <- data.frame(Variable=c("Ant data",
+                                  "Species",
                                   "Region",
                                   "Date",
                                   "Strata",
@@ -82,18 +83,31 @@ metadata <- data.frame(Variable=c("Species",
                                   "S.Total",
                                   "Outdoor.Prob.Current",
                                   "Gain.Outdoor.Prob.2C",
-                                  "Gain.Outdoor.Prob.4C"),
-                       Definition = c("Species name",
-                                    "Region name",
-                                    "The year of the earliest occurrence record in the region",
-                                    "Vertical habitat strata (six categories)",
-                                    "Indoor (Only indoor records)/Naturalized (at least one outdoor record)",
-                                    "Environmental Impact score of the species (the sum of six impacts)",
-                                    "Socioeconomic impact score of the species (the sum of six impacts)",
-                                    "Naturalization probability under current climate",
-                                    "Gain in naturalization probablity under 2°C warming compared with current climate",
-                                    "Gain in naturalization probablity under 4°C warming compared with current climate")
-)
+                                  "Gain.Outdoor.Prob.4C",
+                                  "Response capacity data",
+                                  "Threat",
+                                  "IAS_list",
+                                  "Management",
+                                  "Research",
+                                  "Monitoring"),
+                       Definition = c("",
+                                      "Species name",
+                                      "Region name",
+                                      "The year of the earliest occurrence record in the region",
+                                      "Vertical habitat strata (six categories)",
+                                      "Indoor (Only indoor records)/Naturalized (at least one outdoor record)",
+                                      "Environmental Impact score of the species (the sum of six impacts)",
+                                      "Socioeconomic impact score of the species (the sum of six impacts)",
+                                      "Naturalization probability under current climate",
+                                      "Gain in naturalization probablity under 2°C warming compared with current climate",
+                                      "Gain in naturalization probablity under 4°C warming compared with current climate",
+                                      "",
+                                      "Recognized invasive species as a threat (1=Yes,0=No)",
+                                      "Developed a list of problematic invasive species (1=Comprehensive,0.5=Limited,0=No)",
+                                      "Management strategy of invasive species problems (1=Comprehensive,0.5=Limited,0=No)",
+                                      "Research or international coordinations about invasive species (1=Yes,0=No)",
+                                      "Monitoring invasive species (1=Yes,0=No)")
+                       )
 
 # ##
 ui <-
@@ -157,7 +171,7 @@ ui <-
                           leafletOutput("climate_map"),
                           fluidRow(
                             tabsetPanel(
-                              tabPanel("Data",
+                              tabPanel("Ant Data",
                                        tags$head(tags$style(HTML(css))),
                                        DTOutput("Dynamic")),
                               tabPanel("Current Impacts",
@@ -187,12 +201,15 @@ ui <-
                          This includes occurrences of non-native ants in residential buildings as a nuisance, or contaminating food in storage.
                          Thus some species have impact records in the Gruber et al. database, but they are not listed as harmful here."),
                       h2("What are response capacities?"),
-                      h4("This is extracted from a study evaluating CBD reports by different countries/adminstrative areas in 2015.
+                      h4("This is extracted from a study (Early et al. 2016) evaluating CBD reports by different countries/adminstrative areas in 2015.
                          High response capacities indicate better invasive species management.
-                         Note that the study evaluated the resposne capacity of different countries / adminstrative arears but not regions.
-                         Thus, for example, all the states in the US have the same response capcities. 
-                         However, the US outlying islands are considered as different unit due to very different management.
-                         See the references listed below for details"),
+                         See the original paper (especially Supplementary Table 1) for a detailed explanation.
+                         Note that our study did not consider efforts controlling potential introduction, as indoor populations have already established in the regions. 
+                         If you need to consider efforts controlling potential introduction, please visit the website hosting the dataset (see references below).
+                         Also, Early et al.(2016) evaluated the resposne capacity of different countries / adminstrative arears but not regions.
+                         Thus, in ours tudy, all the states in the US have the same response capcities. 
+                         However, the US outlying islands are considered as different unit due to very different management."),
+                      tableOutput("metadata2"),
                       h2("How reliable are the climate change forecasts?"),
                       h4("Our model has >90% accucracy predicting the status of each population under current climate.
                       Thus we assume it does a decent job predicting the future."),
@@ -453,7 +470,8 @@ server <- function(input, output, session) {
   
   impact_region <- reactive({
     Global_impact <- region_df() %>%  
-      group_by(polygon_name) %>%
+      filter (Status != "Native") %>%
+      group_by(polygon_name) %>% 
       summarize(across(Impact_4C.Animal.production:Impact_2C.S.Total, function(x) sum(x,na.rm=T))) %>%
       ungroup() %>%
       summarize(across(Impact_4C.Animal.production:Impact_2C.S.Total,list(sum=~sum(.x,na.rm=T),
@@ -502,6 +520,7 @@ server <- function(input, output, session) {
   
   impact_current <- reactive({
     Current_impact <- region_df() %>%  
+      filter (Status != "Native") %>%
       summarize(across(Animal.production:S.Total, function(x) sum(x,na.rm=T))) %>% 
       t() %>%
       as.data.frame() %>%
@@ -541,7 +560,7 @@ server <- function(input, output, session) {
   
   Species_impact <- reactive({
     Species_impact <- region_df() %>%  
-      filter(Harmful == "Harmful") %>%
+      filter(Harmful == "Harmful" & Status != "Native") %>%
       group_by(species) %>%
       summarise(across(c("Impact_4C.E.Total","Impact_4C.S.Total","Impact_2C.E.Total","Impact_2C.S.Total","proj_diff_2C","proj_diff_4C"), ~mean(.x,na.rm=T)),
                 n = n()) %>%
@@ -594,13 +613,26 @@ server <- function(input, output, session) {
       bentity.shp.sf %>%
         select("polygon_name",Final_country:total_score) %>%
         as_tibble() %>%
-        select(!geometry & !Final_country)
+        select(!geometry & !Final_country) %>%
+        rename(Threat = threat,
+               IAS_list = IAS_list,
+               Management = Existing_mgmt,
+               Research = research,
+               Monitoring = outreach,
+               Total_score = total_score)
+      
       } else {
           bentity.shp.sf %>%
           filter(id == rv()) %>%
           select("polygon_name",Final_country:total_score) %>%
           as_tibble() %>%
-          select(!geometry & !Final_country)
+          select(!geometry & !Final_country) %>%
+          rename(Threat = threat,
+                 IAS_list = IAS_list,
+                 Management = Existing_mgmt,
+                 Research = research,
+                 Monitoring = outreach,
+                 Total_score = total_score)
       }
   )
   
