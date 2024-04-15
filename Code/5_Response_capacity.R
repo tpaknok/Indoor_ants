@@ -268,3 +268,7 @@ sum(country_score$`2°C Socioeconomic`[order(country_score$`2°C Socioeconomic`,
 sum(country_score$`2°C Socioeconomic`[order(country_score$`2°C Socioeconomic`,decreasing=T)][1:20])/sum(country_score$`2°C Socioeconomic`)
 sum(country_score$`4°C Socioeconomic`[order(country_score$`4°C Socioeconomic`,decreasing=T)][1:10])/sum(country_score$`4°C Socioeconomic`)
 sum(country_score$`4°C Socioeconomic`[order(country_score$`4°C Socioeconomic`,decreasing=T)][1:20])/sum(country_score$`4°C Socioeconomic`)
+
+### for shiny app
+NMI_analysis <- cbind(NMI_analysis,Score_analysis)
+write.csv(NMI_analysis, "ant_indoor_analysis.csv")

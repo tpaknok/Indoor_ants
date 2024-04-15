@@ -13,7 +13,9 @@ clim <- c(temp_pca,water_pca,temp_pca_2C,temp_pca_4C,water_pca_2C,water_pca_4C)
 
 native.records <- read.csv("Data/Native.csv")
 native.records$valid_species_name <- gsub(" ",".",native.records$valid_species_name)
+native.records <- native.records %>% filter(Final == "Yes")
 exotic.records <- read.csv("Data/Exotic_record_date.csv")
+exotic.records <- exotic.records %>% filter(Native_GABI == "N") %>% filter(Improved.Classification != "Native")
 
 #############fix spelling
 exotic.records$valid_species_name[exotic.records$valid_species_name == "Pheidole.indica "] <- "Pheidole.indica"

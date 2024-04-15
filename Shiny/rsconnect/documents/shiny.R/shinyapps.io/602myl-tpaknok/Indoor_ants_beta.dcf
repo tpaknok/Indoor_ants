@@ -5,7 +5,7 @@ account: 602myl-tpaknok
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 11756858
-bundleId: 8496891
+bundleId: 8497365
 url: https://602myl-tpaknok.shinyapps.io/Indoor_ants_beta/
 version: 1
 asMultiple: FALSE
