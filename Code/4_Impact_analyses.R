@@ -106,7 +106,7 @@ g3 <- rasterGrob(warming_tiff,width = unit(0.7,"cm"),height=unit(0.7,"cm"),inter
 xmax <- xmin <- -1.4e07
 ymin <- ymax <- -5250000
 space <- 900000
-size <- 3
+size <- 2.85
 
 p1e <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E))+
   geom_sf(colour="black",linewidth=0.1)+
@@ -114,17 +114,19 @@ p1e <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,max(bentity.shp.sf$current_impact_E,na.rm=T)))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_E,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_E,na.rm=T)/2),max(bentity.shp.sf$current_impact_E,na.rm=T)))+
   theme
 plot(p1e)
 
 p1f <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Socioeconomic",size=size-0.2)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Socioeconomic",size=size)+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,max(bentity.shp.sf$current_impact_S,na.rm=T)))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_S,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_S,na.rm=T)/2),max(bentity.shp.sf$current_impact_S,na.rm=T)))+
   theme
 plot(p1f)
 
@@ -143,7 +145,7 @@ p2e <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_2C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,12.2))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,12),breaks=c(0,3,6,9,12))+
   theme
 
 p2f <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_4C_net))+
@@ -154,29 +156,29 @@ p2f <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_4C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,12.2))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,12),breaks=c(0,3,6,9,12))+
   theme
 
 p2g <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size-0.2)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,7.2))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,7),breaks=c(0,3.5,7))+
   theme
 
 p2h  <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size-0.2)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,7.2))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,7),breaks=c(0,3.5,7))+
   theme
 
 pS4c <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_E))+
@@ -187,18 +189,18 @@ pS4c <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_E))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.01,8.4))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,8.4))+
   theme
 
 pS4d <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_S))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Socioeconomic",size=size-0.2)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.01,4.5))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,4.5))+
   theme
 
 p2 <- ggarrange(p2a,p2b,p2c,p2d,p2e,p2f,p2g,p2h,nrow=4,ncol=2)

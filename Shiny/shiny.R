@@ -30,9 +30,11 @@ bentity.shp.sf <- bentity.shp.sf %>%
                                          "research",
                                          "outreach",
                                          "total_score")]),
-                      by="polygon_name") 
+                      by="polygon_name") %>%   filter(polygon_name != "India" & polygon_name != "Colombia")
   
-alldata <- alldata %>% left_join(bentity.shp.sf[,c("polygon_name","id")],by="polygon_name")
+alldata <- alldata %>% 
+  left_join(bentity.shp.sf[,c("polygon_name","id")],by="polygon_name") %>%
+  filter(polygon_name != "India" & polygon_name != "Colombia")
 
 all_harmful <- unique(alldata$species[alldata$Harmful == "Harmful"])
 alldata[alldata$species %in% all_harmful,"Harmful"] <- "Harmful"
@@ -236,7 +238,7 @@ ui <-
                       h3(a("Response capacity"), href="https://www.fabiogeography.com/data"),
                       h4("Early, R., Bradley, B. A., Dukes, J. S., Lawler, J. J., Olden, J. D., Blumenthal, D. M., … Miller, L. P. (2016). Global threats from invasive alien species in the twenty-first century and national response capacities. Nature Communications, 7(1), 12485."),
                       h2("How to report a bug? Have questions? Want more features?"),
-                      h4("Send an email to Toby P.N. Tsang (tpaknok@gmail.com)"),
+                      h4("Send an email to Toby P.N. Tsang (tpaknok@gmail.com).")
                       )
              )
 

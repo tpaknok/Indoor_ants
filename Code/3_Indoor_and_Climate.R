@@ -137,17 +137,17 @@ predict_niche$group <- as.numeric(as.character(predict_niche$group))
 NMI_analysis$Status <- ifelse(NMI_analysis$num == 0, "Indoor", "Naturalized")
 
 theme <- theme(axis.line=element_line(colour="black"),
-               axis.text = element_text(size=6),
-               axis.title = element_text(size=6),
+               axis.text = element_text(size=7),
+               axis.title = element_text(size=7),
                legend.position="bottom",
                panel.background=element_rect(colour="white",fill="white"),
                panel.grid.major=element_blank(),
                panel.grid.minor=element_blank(),
                plot.background=element_rect(colour="white",fill="white"),
                legend.key.height = unit(0.25, "cm"),
-               legend.key.width = unit(0.3, "cm"),
-               legend.title= element_text(size=6),
-               legend.text = element_text(size=6),
+               legend.key.width = unit(0.6, "cm"),
+               legend.title= element_text(size=7),
+               legend.text = element_text(size=7),
                legend.margin=margin(t=0.2,unit="cm"))
 
 p1<- ggplot(predict_niche,aes(y=group,x=x))+
@@ -156,9 +156,12 @@ p1<- ggplot(predict_niche,aes(y=group,x=x))+
   #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b)",size=3)+
   xlab("Temperature PCA1 of invaded region \n (Colder and more seasonal)")+
   ylab("Temperature PCA1 of native range \n (Colder and more seasonal)")+
-  scale_fill_continuous(low="#ffffb2",high="#e31a1c",name="Predicted naturalization probability",breaks=c(0.1,0.5,0.9))+
-  scale_color_manual(values=c("grey60","black"))+
-  theme
+  scale_fill_continuous(low="#ffffb2",high="#e31a1c",name="Predicted naturalization probability",limits=c(0,1),breaks=c(0,0.25,0.5,0.75,1))+
+  scale_color_manual(values=c("grey60","black"),name="")+
+  theme+
+  guides(fill=guide_colourbar(title.position="top"),
+        colour=guide_legend(title.position="top",
+                            override.aes = list(size = 5)))
 plot(p1)
 
 ggsave("Figures/Fig1.tiff",dpi=800,height=8.4,width=10.4,units="cm",compression="lzw",bg="white")
@@ -309,7 +312,7 @@ ratio <- tmaptools::get_asp_ratio(bentity.shp.sf)
 
 xmax <- xmin <- -1.4e07
 ymin <- ymax <- -5250000
-size <- 2.7
+size <- 2.85
 theme <- theme(axis.line=element_blank(),
                axis.text.x=element_blank(),
                axis.text.y=element_blank(),
@@ -321,10 +324,10 @@ theme <- theme(axis.line=element_blank(),
                panel.grid.major=element_blank(),
                panel.grid.minor=element_blank(),
                plot.background=element_rect(colour="white",fill="white"),
-               plot.margin=unit(c(-0.1,0.1,-0.65,-0.1),"cm"),
+               plot.margin=unit(c(-0.1,0.1,-0.5,-0.1),"cm"),
                legend.key.height = unit(0.15, "cm"),
                legend.key.width = unit(0.25, "cm"),
-               legend.text=element_text(size=4),
+               legend.text=element_text(size=7),
                legend.spacing.y = unit(0.5, "mm"),
                legend.margin=margin(t=-0.5,unit="cm"),
                legend.background=element_rect(fill="white"),
@@ -333,46 +336,46 @@ theme <- theme(axis.line=element_blank(),
                legend.justification = c("right", "top"))
 
 p1a <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr))+
-  geom_sf(colour="black",size=0.1)+
+  geom_sf(colour="black",linewidth=0.1)+
   annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,70),breaks=c(1,35,70))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,70),breaks=c(1,24,47,70))+
   theme
 
 plot(p1a)
 
 p1b <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr))+
-  geom_sf(colour="black",size=0.1)+
+  geom_sf(colour="black",linewidth=0.1)+
   annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Non-native",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,70),breaks=c(1,35,70))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,70),breaks=c(1,24,47,70))+
   theme
 
 p1c <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr.Harmful))+
-  geom_sf(colour="black",size=0.1)+
+  geom_sf(colour="black",linewidth=0.1)+
   annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(c) Harmful",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0.5,8.5),breaks=c(1,4,8))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,8),breaks=c(1,3,5,7))+
   theme
 plot(p1c)
 
 p1d <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr.Harmful))+
-  geom_sf(colour="black",size=0.1)+
+  geom_sf(colour="black",linewidth=0.1)+
   annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Harmful",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0.5,16.5),breaks=c(1,8,16))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,16),breaks=c(1,6,11,16))+
   theme
 
 ###Fig2a-d
@@ -393,7 +396,7 @@ g3 <- rasterGrob(warming_tiff,width = unit(0.7,"cm"),height=unit(0.7,"cm"),inter
 xmax <- xmin <- -1.4e07
 ymin <- ymax <- -5250000
 space <- 900000
-size <- 2.7
+size <- 2.85
 p2a <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
   annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
@@ -402,7 +405,7 @@ p2a <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_2C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,5.26),breaks = c(0,2,4))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,5.3),breaks = c(0,2.5,5))+
   theme
 plot(p2a)
 
@@ -414,7 +417,7 @@ p2b <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_4C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,5.26),breaks = c(0,2,4))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,5.3),breaks = c(0,2.5,5))+
   theme
 plot(p2b)
 
@@ -426,7 +429,7 @@ p2c <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_2C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,1.5),breaks = c(0,0.5,1,1.5))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,1.5),breaks = c(0,0.5,1,1.5))+
   theme
 plot(p2c)
 
@@ -438,7 +441,7 @@ p2d <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_4C_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,1.5),breaks = c(0,0.5,1,1.5))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,1.5),breaks = c(0,0.5,1,1.5))+
   theme
 plot(p2d)
 
@@ -451,7 +454,7 @@ pS4a <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_indoor_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.1,3.8),breaks = c(0,1,2,3,4))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,4),breaks = c(0,2,4))+
   theme
 plot(pS4a)
 
@@ -463,6 +466,7 @@ pS4b <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_Harmful_indoor_net))+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(-0.01,1.01),breaks = c(0,0.5,1))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,1),breaks = c(0,0.5,1))+
   theme
 plot(pS4b)
+
