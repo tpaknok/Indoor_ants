@@ -164,7 +164,7 @@ p1<- ggplot(predict_niche,aes(y=group,x=x))+
                             override.aes = list(size = 5)))
 plot(p1)
 
-ggsave("Figures/Fig1.tiff",dpi=800,height=8.4,width=10.4,units="cm",compression="lzw",bg="white")
+ggsave("Figures/Model_results.tiff",dpi=800,height=8.4,width=10.4,units="cm",compression="lzw",bg="white")
 
 ### Climate change projection
 NMI_analysis$dummy <- 1

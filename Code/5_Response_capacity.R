@@ -100,7 +100,7 @@ pS6 <- ggplot(data=country_sf,aes(fill=total))+
 
 plot(pS6)
 
-ggsave("Figures/FigS6.tiff",dpi=800,width=16,height=10,compression="lzw")
+ggsave("Figures/Response_capacity.tiff",dpi=800,width=16,height=10,compression="lzw")
 
 not_found <- bentity.shp.df$Final_country[!bentity.shp.df$Final_country %in% capacity$Country_global]
 not_found <- sort(unique(not_found)) #Bentity polygon not considered
@@ -149,7 +149,7 @@ p3 <- ggplot(data=record_score)+
   theme(legend.position="bw")
 
 plot(p3)
-ggsave("Figures/Fig3.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
+ggsave("Figures/Score_and_impact.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
 
 ### Make FigS5 (Country level variations - given the same response capacities)
 country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% summarise("2°C Non-native" = sum(proj_diff_2C),
@@ -194,7 +194,7 @@ pS5 <- ggplot(data=country_record_score_long)+
   theme(legend.position="bw")
 
 plot(pS5)
-ggsave("Figures/FigS5.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
+ggsave("Figures/Score_and_impact_boxplot.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
 
 ### figure 4
 country_score <- sp_country %>% group_by(Final_country) %>% summarise("2°C Non-native" = sum(proj_diff_2C),

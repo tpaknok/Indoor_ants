@@ -4,25 +4,29 @@ Score_analysis[is.na(Score_analysis)] <- 0
 
 NMI_analysis$Impact_4C <- NMI_analysis$proj_diff_4C*Score_analysis #although here used proj_diff_4C, later analyses will only include indoor populations. Therefore the change will be 100% contributed by indoor population, not outdoor population experiencing altered climatic suitability.
 NMI_analysis$Impact_2C <- NMI_analysis$proj_diff_2C*Score_analysis
-NMI_analysis$Impact_current <- NMI_analysis$num*Score_analysis # num = 1 for naturalized species
+NMI_analysis$Impact_current <- Score_analysis # num = 1 for naturalized species
 NMI_analysis <- do.call(cbind,NMI_analysis)
 
-site_impact_summary <- NMI_analysis %>% 
+map_summary <- NMI_analysis %>% 
   group_by(polygon_name,ID) %>% 
-  summarize(impact_total_current_E = sum(Impact_current.E.Total,na.rm=T)[num=1],
-            impact_total_2C_E = sum(Impact_2C.E.Total[num == 0]),
-            impact_total_4C_E = sum(Impact_4C.E.Total[num == 0]),
-            impact_increase_2C_E = impact_total_2C_E/impact_total_current_E*100,
-            impact_increase_4C_E = impact_total_4C_E/impact_total_current_E*100,
-            impact_total_current_S = sum(Impact_current.S.Total)[num=1],
-            impact_total_2C_S = sum(Impact_2C.S.Total[num == 0]),
-            impact_total_4C_S = sum(Impact_4C.S.Total[num == 0]),
-            impact_increase_2C_S = impact_total_2C_S/impact_total_current_S*100,
-            impact_increase_4C_S = impact_total_4C_S/impact_total_current_S*100,
-            current_Harmful_indoor = sum(dummy[Harmful=="Harmful" & num == 0])) %>% filter(current_Harmful_indoor > 0)
+  reframe(impact_total_current_E_outdoor = sum(Impact_current.E.Total[num==1],na.rm=T),
+          impact_total_current_E_indoor = sum(Impact_current.E.Total[num==0],na.rm=T),
+          impact_total_2C_E = sum(Impact_2C.E.Total[num == 0]),
+          impact_total_4C_E = sum(Impact_4C.E.Total[num == 0]),
+          impact_increase_2C_E = impact_total_2C_E/impact_total_current_E_outdoor*100,
+          impact_increase_4C_E = impact_total_4C_E/impact_total_current_E_outdoor*100,
+          impact_total_current_S_outdoor = sum(Impact_current.S.Total[num==1],na.rm=T),
+          impact_total_current_S_indoor = sum(Impact_current.S.Total[num==0],na.rm=T),
+          impact_total_2C_S = sum(Impact_2C.S.Total[num == 0]),
+          impact_total_4C_S = sum(Impact_4C.S.Total[num == 0]),
+          impact_increase_2C_S = impact_total_2C_S/impact_total_current_S_outdoor*100,
+          impact_increase_4C_S = impact_total_4C_S/impact_total_current_S_outdoor*100,
+          current_Harmful_indoor = sum(dummy[Harmful=="Harmful" & num == 0])) #for making maps
 
-mean(site_impact_summary$impact_total_2C_E)/mean(site_impact_summary$impact_total_current_E)*100 #percentage gain in E_score in 2C scenario
-mean(site_impact_summary$impact_total_4C_E)/mean(site_impact_summary$impact_total_current_E)*100 #percentage gain in E_score in 4C scenario
+site_impact_summary <- map_summary %>% filter(current_Harmful_indoor > 0) #for calculating impact increases 
+
+mean(site_impact_summary$impact_total_2C_E)/mean(site_impact_summary$impact_total_current_E_outdoor)*100 #percentage gain in E_score in 2C scenario
+mean(site_impact_summary$impact_total_4C_E)/mean(site_impact_summary$impact_total_current_E_outdoor)*100 #percentage gain in E_score in 4C scenario
 mean(site_impact_summary$impact_total_2C_E)
 mean(site_impact_summary$impact_total_4C_E)
 min(site_impact_summary$impact_total_2C_E)
@@ -30,8 +34,8 @@ min(site_impact_summary$impact_total_4C_E)
 max(site_impact_summary$impact_total_2C_E)
 max(site_impact_summary$impact_total_4C_E)
 
-mean(site_impact_summary$impact_total_2C_S)/mean(site_impact_summary$impact_total_current_S)*100 #percentage gain in S_score in 2C scenario
-mean(site_impact_summary$impact_total_4C_S)/mean(site_impact_summary$impact_total_current_S)*100 #percentage gain in S_score in 4C scenario
+mean(site_impact_summary$impact_total_2C_S)/mean(site_impact_summary$impact_total_current_S_outdoor)*100 #percentage gain in S_score in 2C scenario
+mean(site_impact_summary$impact_total_4C_S)/mean(site_impact_summary$impact_total_current_S_outdoor)*100 #percentage gain in S_score in 4C scenario
 mean(site_impact_summary$impact_total_2C_S)
 mean(site_impact_summary$impact_total_4C_S)
 min(site_impact_summary$impact_total_2C_S)
@@ -86,17 +90,25 @@ pS2 <- ggplot(Global_impact,aes(label=n,y=Impact,x=Score,fill=Warming))+
 
 plot(pS2)
 
-ggsave("Figures/FigS2.tiff",width=16,height=8,units="cm",dpi=600,compression="lzw")
+ggsave("Figures/Cumulative_score.tiff",width=16,height=8,units="cm",dpi=600,compression="lzw")
 ### Sub-figures on impacts, including Figure 2, S1, S4
-bentity.shp.sf$proj_diff_impact_E_2C_net <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_E"])
-bentity.shp.sf$proj_diff_impact_E_4C_net<- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_E"])
-bentity.shp.sf$proj_diff_impact_S_2C_net <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_S"])
-bentity.shp.sf$proj_diff_impact_S_4C_net<- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_S"])
-bentity.shp.sf$warming_diff_impact_E <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_E"]-site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_E"]) #4C - 2C E
-bentity.shp.sf$warming_diff_impact_S <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_S"]-site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_S"]) #4C - 2C S
+bentity.shp.sf$proj_diff_impact_E_2C_net <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_E"])
+bentity.shp.sf$proj_diff_impact_E_4C_net<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_E"])
+bentity.shp.sf$proj_diff_impact_S_2C_net <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_S"])
+bentity.shp.sf$proj_diff_impact_S_4C_net<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_S"])
+bentity.shp.sf$warming_diff_impact_E <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_E"]-map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_E"]) #4C - 2C E
+bentity.shp.sf$warming_diff_impact_S <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_S"]-map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_S"]) #4C - 2C S
 
-bentity.shp.sf$current_impact_E<- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_current_E"])
-bentity.shp.sf$current_impact_S<- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_current_S"])
+bentity.shp.sf$current_impact_E_outdoor<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_current_E_outdoor"])
+bentity.shp.sf$current_impact_S_outdoor<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_current_S_outdoor"])
+bentity.shp.sf$current_impact_E_indoor<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_current_E_indoor"])
+bentity.shp.sf$current_impact_S_indoor <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_current_S_indoor"])
+
+bentity.shp.sf$current_impact_E_indoor[is.na(bentity.shp.sf$indoor.sr.Harmful)] <- NA
+bentity.shp.sf$current_impact_S_indoor[is.na(bentity.shp.sf$indoor.sr.Harmful)] <- NA
+
+bentity.shp.sf$current_impact_E_outdoor[is.na(bentity.shp.sf$outdoor.sr.Harmful)] <- NA
+bentity.shp.sf$current_impact_S_outdoor[is.na(bentity.shp.sf$outdoor.sr.Harmful)] <- NA
 
 library(tiff)
 library(grid)
@@ -108,32 +120,56 @@ ymin <- ymax <- -5250000
 space <- 900000
 size <- 2.85
 
-p1e <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E))+
+p1e <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E_indoor))+
   geom_sf(colour="black",linewidth=0.1)+
   annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(e) Environmental",size=size)+
+  annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_E,na.rm=T)),
-                        breaks=c(0,round(max(bentity.shp.sf$current_impact_E,na.rm=T)/2),max(bentity.shp.sf$current_impact_E,na.rm=T)))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_E_indoor,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_E_indoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_E_indoor,na.rm=T)))+
   theme
 plot(p1e)
 
-p1f <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S))+
+p1f <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E_outdoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Socioeconomic",size=size)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Environmental",size=size)+
+  annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_S,na.rm=T)),
-                        breaks=c(0,round(max(bentity.shp.sf$current_impact_S,na.rm=T)/2),max(bentity.shp.sf$current_impact_S,na.rm=T)))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_E_outdoor,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_E_outdoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_E_outdoor,na.rm=T)))+
   theme
 plot(p1f)
 
+p1g <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_indoor))+
+  geom_sf(colour="black",linewidth=0.1)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
+  annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
+  labs(fill="")+
+  xlim(-14800000,14800000)+
+  ylim(-6500000,9000000)+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_S_indoor,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_S_indoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_S_indoor,na.rm=T)))+
+  theme
+
+p1h <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_outdoor))+
+  geom_sf(colour="black",linewidth=0.1)+
+  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
+  annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
+  labs(fill="")+
+  xlim(-14800000,14800000)+
+  ylim(-6500000,9000000)+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_S_outdoor,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_S_outdoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_S_outdoor,na.rm=T)))+
+  theme
+
 library(ggpubr)
-p1 <- ggarrange(p1a,p1b,p1c,p1d,p1e,p1f,hjust=0,vjust=0,label.x=0,label.y=0,nrow=3,ncol=2)
+p1 <- ggarrange(p1a,p1b,p1c,p1d,p1e,p1f,p1g,p1h,hjust=0,vjust=0,label.x=0,label.y=0,nrow=4,ncol=2)
 plot(p1)
-ggsave("Figures/FigS1.tiff",dpi=800,compression="lzw",units="cm",height=9.5*1.5,width=16.8,bg="white")
+ggsave("Figures/Current.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3*4.5,width=16.8,bg="white")
 
 ###
 
@@ -205,7 +241,7 @@ pS4d <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_S))+
 
 p2 <- ggarrange(p2a,p2b,p2c,p2d,p2e,p2f,p2g,p2h,nrow=4,ncol=2)
 plot(p2)
-ggsave("Figures/Fig2.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3*4.5,width=16.8,bg="white")
+ggsave("Figures/Future.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3*4.5,width=16.8,bg="white")
 
 ###Species level summary on impactsm and Fig S2
 Species_summary <- NMI_analysis %>% group_by(species) %>% filter(Harmful == "Harmful" & num == 0)  %>% summarize(increase_2C = sum(proj_diff_2C),
@@ -243,13 +279,13 @@ pS3 <- ggplot(data=Species_summary_long,aes(y=species,x=value,fill=Warming))+
         legend.key.width = unit(0.5, "cm"),
         legend.title = element_text(size=6))
 plot(pS3)
-ggsave("Figures/FigS3.tiff",dpi=800,compression="lzw",units="cm",height=13.5,width=16.8,bg="white")
+ggsave("Figures/Species_impact.tiff",dpi=800,compression="lzw",units="cm",height=13.5,width=16.8,bg="white")
 
 ###
 
 pS4<- ggarrange(pS4a,pS4b,pS4c,pS4d)
 plot(pS4)
-ggsave("Figures/FigS4.tiff",dpi=800,compression="lzw",units="cm",height=8.4*1.25,width=16.8,bg="white")
+ggsave("Figures/Warming_diff.tiff",dpi=800,compression="lzw",units="cm",height=8.4*1.25,width=16.8,bg="white")
 
 #pairwise correlations between gain in alien, harmful, E and S impacts between the two scenarios. Only consider polygon with >= 1 populations.
 cor(subset(site_summary,current_indoor != 0)$proj_diff_indoor_2C_net,subset(site_summary,current_indoor != 0)$proj_diff_indoor_4C_net,method="kendall") 
