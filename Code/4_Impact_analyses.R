@@ -25,6 +25,12 @@ map_summary <- NMI_analysis %>%
 
 site_impact_summary <- map_summary %>% filter(current_Harmful_indoor > 0) #for calculating impact increases 
 
+### summary stats - impact forecasts
+sum(site_impact_summary$impact_total_2C_E > 0)
+sum(site_impact_summary$impact_total_4C_E > 0)
+sum(site_impact_summary$impact_total_2C_S > 0)
+sum(site_impact_summary$impact_total_4C_S > 0)
+
 mean(site_impact_summary$impact_total_2C_E)/mean(site_impact_summary$impact_total_current_E_outdoor)*100 #percentage gain in E_score in 2C scenario
 mean(site_impact_summary$impact_total_4C_E)/mean(site_impact_summary$impact_total_current_E_outdoor)*100 #percentage gain in E_score in 4C scenario
 mean(site_impact_summary$impact_total_2C_E)
@@ -57,7 +63,7 @@ Global_impact <- data.frame(Score=t(Global_impact[seq(1,56,by=2)]),
                             Warming = c(rep("4°C",14),rep("2°C",14)),
                             Impact = rep(names(NMI_analysis$proj_diff_4C*Score_analysis),2))
 
-Global_impact$Type <- ifelse(Global_impact$Impact == "Animals" | Global_impact$Impact == "Competition" | Global_impact$Impact == "Diseases" | Global_impact$Impact == "Ecosystems" | Global_impact$Impact == "Hybridization" | Global_impact$Impact == "Plants", "Environmental","Socioeconomic")
+Global_impact$Type <- ifelse(Global_impact$Impact == "Animals" | Global_impact$Impact == "Competition" | Global_impact$Impact == "Diseases" | Global_impact$Impact == "Ecosystems" | Global_impact$Impact == "Hybridization" | Global_impact$Impact == "Plants", "Environmental impact","Socioeconomic impact")
 
 Global_impact <- subset(Global_impact, Impact != "E.Total" & Impact != "S.Total")
 
@@ -71,12 +77,12 @@ Global_impact$Warming <- factor(Global_impact$Warming,levels=c("4°C","2°C"))
 pS2 <- ggplot(Global_impact,aes(label=n,y=Impact,x=Score,fill=Warming))+
   geom_bar(stat="identity",position = 'dodge')+
   geom_text(aes(label=n), position=position_dodge(width=0.9), hjust=-0.25,size=2)+
-  xlab("Cumulative score increases across regions under warming")+
+  xlab("Cumulative score increases across regions with under warming")+
   ylab("")+
   scale_fill_manual(values=c("#bd0026","#feb24c"))+
   theme_classic()+
   facet_wrap(~Type,scales="free_y")+
-  xlim(0,112)+
+  xlim(0,60)+
   theme_bw()+
   theme(legend.position="bottom",
         axis.text.x=element_text(size=6),
@@ -92,12 +98,12 @@ plot(pS2)
 
 ggsave("Figures/Cumulative_score.tiff",width=16,height=8,units="cm",dpi=600,compression="lzw")
 ### Sub-figures on impacts, including Figure 2, S1, S4
-bentity.shp.sf$proj_diff_impact_E_2C_net <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_E"])
-bentity.shp.sf$proj_diff_impact_E_4C_net<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_E"])
-bentity.shp.sf$proj_diff_impact_S_2C_net <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_S"])
-bentity.shp.sf$proj_diff_impact_S_4C_net<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_S"])
-bentity.shp.sf$warming_diff_impact_E <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_E"]-map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_E"]) #4C - 2C E
-bentity.shp.sf$warming_diff_impact_S <- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_4C_S"]-map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_2C_S"]) #4C - 2C S
+bentity.shp.sf$proj_diff_impact_E_2C_net <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_E"])
+bentity.shp.sf$proj_diff_impact_E_4C_net<- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_E"])
+bentity.shp.sf$proj_diff_impact_S_2C_net <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_S"])
+bentity.shp.sf$proj_diff_impact_S_4C_net<- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_S"])
+bentity.shp.sf$warming_diff_impact_E <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_E"]-site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_E"]) #4C - 2C E
+bentity.shp.sf$warming_diff_impact_S <- unlist(site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_4C_S"]-site_impact_summary[match(bentity.shp.sf$BENTITY2_N,site_impact_summary$polygon_name),"impact_total_2C_S"]) #4C - 2C S
 
 bentity.shp.sf$current_impact_E_outdoor<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_current_E_outdoor"])
 bentity.shp.sf$current_impact_S_outdoor<- unlist(map_summary[match(bentity.shp.sf$BENTITY2_N,map_summary$polygon_name),"impact_total_current_S_outdoor"])
@@ -110,6 +116,10 @@ bentity.shp.sf$current_impact_S_indoor[is.na(bentity.shp.sf$indoor.sr.Harmful)] 
 bentity.shp.sf$current_impact_E_outdoor[is.na(bentity.shp.sf$outdoor.sr.Harmful)] <- NA
 bentity.shp.sf$current_impact_S_outdoor[is.na(bentity.shp.sf$outdoor.sr.Harmful)] <- NA
 
+bentity.shp.sf[which.max(bentity.shp.sf$current_impact_E_indoor),na.rm=T]
+bentity.shp.sf[which.max(bentity.shp.sf$current_impact_E_outdoor),na.rm=T]
+bentity.shp.sf[which.max(bentity.shp.sf$current_impact_E_indoor),na.rm=T]
+bentity.shp.sf[which.max(bentity.shp.sf$current_impact_E_outdoor),na.rm=T]
 library(tiff)
 library(grid)
 warming_tiff <- readTIFF("Figures/warming.tif")
@@ -122,19 +132,19 @@ size <- 2.85
 
 p1e <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E_indoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(e) Environmental",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(e) Environmental",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_E_indoor,na.rm=T)),
-                        breaks=c(0,round(max(bentity.shp.sf$current_impact_E_indoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_E_indoor,na.rm=T)))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_E_outdoor,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_E_outdoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_E_outdoor,na.rm=T)))+
   theme
 plot(p1e)
 
 p1f <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E_outdoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Environmental",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Environmental",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -146,18 +156,18 @@ plot(p1f)
 
 p1g <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_indoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_S_indoor,na.rm=T)),
-                        breaks=c(0,round(max(bentity.shp.sf$current_impact_S_indoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_S_indoor,na.rm=T)))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,max(bentity.shp.sf$current_impact_S_outdoor,na.rm=T)),
+                        breaks=c(0,round(max(bentity.shp.sf$current_impact_S_outdoor,na.rm=T)/2),max(bentity.shp.sf$current_impact_S_outdoor,na.rm=T)))+
   theme
 
 p1h <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_outdoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -167,7 +177,21 @@ p1h <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_outdoor))+
   theme
 
 library(ggpubr)
-p1 <- ggarrange(p1a,p1b,p1c,p1d,p1e,p1f,p1g,p1h,hjust=0,vjust=0,label.x=0,label.y=0,nrow=4,ncol=2)
+p1 <- ggarrange(p1a,p1b,p1c,p1d,p1e,p1f,p1g,p1h,
+                labels = c("(a) Non-native ant richness",
+                           "(b) Non-native ant richness",
+                           "(c) Harmful ant richness",
+                           "(d) Harmful ant richness",
+                           "(e) Environmental impact",
+                           "(f) Environmental impact",
+                           "(g) Socioeconomic impact",
+                           "(h) Socioeconomic impact"),
+                nrow=4,
+                hjust=0,
+                vjust=0,
+                label.y=0.9,
+                font.label=list(size=8),
+                ncol=2)
 plot(p1)
 ggsave("Figures/Current.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3*4.5,width=16.8,bg="white")
 
@@ -175,71 +199,84 @@ ggsave("Figures/Current.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3
 
 p2e <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(e) Environmental",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(e) Environmental",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,12),breaks=c(0,3,6,9,12))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,6.5),breaks=c(0,3.2,6.5))+
   theme
 
 p2f <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Environmental",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Environmental",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,12),breaks=c(0,3,6,9,12))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,6.5),breaks=c(0,3.2,6.5))+
   theme
 
 p2g <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,7),breaks=c(0,3.5,7))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,3.6),breaks=c(0,1.8,3.6))+
   theme
 
 p2h  <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,7),breaks=c(0,3.5,7))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,3.6),breaks=c(0,1.8,3.6))+
   theme
 
 pS4c <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_E))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(c) Environmental",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(c) Environmental",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,8.4))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,4.2),breaks=c(0,2.1,4.2))+
   theme
 
 pS4d <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_S))+
   geom_sf(colour="black",linewidth=0.1)+
-  annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Socioeconomic",size=size)+
+  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,4.5))+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,2.5),breaks=c(0,1.2,2.5))+
   theme
 
-p2 <- ggarrange(p2a,p2b,p2c,p2d,p2e,p2f,p2g,p2h,nrow=4,ncol=2)
+p2 <- ggarrange(p2a,p2b,p2c,p2d,p2e,p2f,p2g,p2h,
+                labels = c("(a) Non-native ant richness",
+                           "(b) Non-native ant richness",
+                           "(c) Harmful ant richness",
+                           "(d) Harmful ant richness",
+                           "(e) Environmental impact",
+                           "(f) Environmental impact",
+                           "(g) Socioeconomic impact",
+                           "(h) Socioeconomic impact"),
+                hjust=0,
+                vjust=0,
+                label.y=0.9,
+                font.label=list(size=8),
+                nrow=4,ncol=2)
 plot(p2)
 ggsave("Figures/Future.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3*4.5,width=16.8,bg="white")
 
@@ -254,18 +291,18 @@ Species_summary <- NMI_analysis %>% group_by(species) %>% filter(Harmful == "Har
 Species_summary_long <- Species_summary %>% pivot_longer(!species)
 
 Species_summary_long$Warming <- ifelse(grepl("2C",Species_summary_long$name),"2°C","4°C")
-Species_summary_long$Type <- ifelse(grepl("_E_",Species_summary_long$name),"Environmental",
-ifelse(grepl("_S",Species_summary_long$name),"Socioeconomic","Naturalization probablity"))
+Species_summary_long$Type <- ifelse(grepl("_E_",Species_summary_long$name),"Environmental impact",
+ifelse(grepl("_S",Species_summary_long$name),"Socioeconomic impact","Naturalization probablity"))
 
 Species_summary_long$Warming <- factor(Species_summary_long$Warming,levels=c("4°C","2°C")) 
-Species_summary_long$Type <- factor(Species_summary_long$Type,levels=c("Naturalization probablity","Environmental","Socioeconomic")) 
+Species_summary_long$Type <- factor(Species_summary_long$Type,levels=c("Naturalization probablity","Environmental impact","Socioeconomic impact")) 
 Species_summary_long$species <- factor(Species_summary_long$species,levels= sort(unique(Species_summary_long$species),decreasing=T))
 
 pS3 <- ggplot(data=Species_summary_long,aes(y=species,x=value,fill=Warming))+
   geom_bar(stat="Identity",position="dodge")+
   facet_wrap(~Type,scale="free_x")+
-  xlab("Cumulative increases across indoor populations under warming")+
-  ylab("Species (Number of indoor populations)")+
+  xlab("Cumulative increases across regions with indoor-restricted status under warming")+
+  ylab("Species (Number of regions with indoor-restricted status)")+
   scale_fill_manual(values=c("#bd0026","#feb24c"))+
   scale_y_discrete(labels = paste0("<i>",gsub("\\."," ",levels(Species_summary_long$species)),"</i>"," (",rev(Species_summary$indoor_region),")"))+
   theme_bw()+
@@ -283,12 +320,21 @@ ggsave("Figures/Species_impact.tiff",dpi=800,compression="lzw",units="cm",height
 
 ###
 
-pS4<- ggarrange(pS4a,pS4b,pS4c,pS4d)
-plot(pS4)
+pS4<- ggarrange(pS4a,pS4b,pS4c,pS4d,
+                labels = c("(a) Non-native ant richness",
+                           "(b) Harmful ant richness",
+                           "(c) Environmental impact",
+                           "(d) Socioeconomic impact"),
+                hjust=0,
+                vjust=0,
+                label.y=0.9,
+                font.label=list(size=8),
+                nrow=2,ncol=2)
+
 ggsave("Figures/Warming_diff.tiff",dpi=800,compression="lzw",units="cm",height=8.4*1.25,width=16.8,bg="white")
 
 #pairwise correlations between gain in alien, harmful, E and S impacts between the two scenarios. Only consider polygon with >= 1 populations.
-cor(subset(site_summary,current_indoor != 0)$proj_diff_indoor_2C_net,subset(site_summary,current_indoor != 0)$proj_diff_indoor_4C_net,method="kendall") 
-cor(subset(site_summary,current_indoor_Harmful != 0)$proj_diff_Harmful_indoor_2C_net,subset(site_summary,current_indoor_Harmful != 0)$proj_diff_Harmful_indoor_4C_net,method="kendall")
-cor(site_impact_summary$impact_total_2C_E,site_impact_summary$impact_total_4C_E,method="kendall")
-cor(site_impact_summary$impact_total_2C_S,site_impact_summary$impact_total_4C_S,method="kendall")
+cor.test(subset(site_summary,current_indoor != 0)$proj_diff_indoor_2C_net,subset(site_summary,current_indoor != 0)$proj_diff_indoor_4C_net,method="kendall") 
+cor.test(subset(site_summary,current_indoor_Harmful != 0)$proj_diff_Harmful_indoor_2C_net,subset(site_summary,current_indoor_Harmful != 0)$proj_diff_Harmful_indoor_4C_net,method="kendall")
+cor.test(site_impact_summary$impact_total_2C_E,site_impact_summary$impact_total_4C_E,method="kendall")
+cor.test(site_impact_summary$impact_total_2C_S,site_impact_summary$impact_total_4C_S,method="kendall")

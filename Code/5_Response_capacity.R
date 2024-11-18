@@ -80,11 +80,11 @@ theme <- theme(axis.line=element_blank(),
                panel.grid.major=element_blank(),
                panel.grid.minor=element_blank(),
                plot.background=element_rect(colour="white",fill="white"),
-               legend.key.height = unit(0.5, "cm"),
-               legend.key.width = unit(2, "cm"),
+               legend.key.height = unit(0.25, "cm"),
+               legend.key.width = unit(1, "cm"),
                legend.text = element_text(size=12),
-               legend.title=element_text(size=18),
-               legend.margin=margin(t=-0.5,unit="cm"),
+               legend.title=element_text(size=12),
+               legend.margin=margin(t=0,unit="cm"),
                legend.background=element_rect(fill="white"))
 
 country_sf <- st_wrap_dateline(country_sf)
@@ -95,12 +95,12 @@ pS6 <- ggplot(data=country_sf,aes(fill=total))+
   labs(fill="Total response capacity score")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="grey")+
+  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white")+
   theme
 
 plot(pS6)
 
-ggsave("Figures/Response_capacity.tiff",dpi=800,width=16,height=10,compression="lzw")
+ggsave("Figures/Response_capacity.tiff",dpi=800,width=12,height=8,compression="lzw",units="cm")
 
 not_found <- bentity.shp.df$Final_country[!bentity.shp.df$Final_country %in% capacity$Country_global]
 not_found <- sort(unique(not_found)) #Bentity polygon not considered
@@ -124,19 +124,26 @@ sp_country <- NMI_analysis %>% group_by(species,Final_country,Harmful,total_scor
                                                                                                                        Impact_4C.S.Total = max(Impact_4C.S.Total))
 
 ### Distribution of climate change effects along different response capacities
-record_score <- sp_country %>% group_by(total_score) %>% summarise("2°C Non-native" = sum(proj_diff_2C),
-                                                                   "4°C Non-native" = sum(proj_diff_4C),
-                                                                   "2°C Harmful" = sum(proj_diff_2C[Harmful == "Harmful"]),
-                                                                   "4°C Harmful" = sum(proj_diff_4C[Harmful=="Harmful"]),
-                                                                   "2°C Environmental" = sum(Impact_2C.E.Total),
-                                                                   "4°C Environmental" = sum(Impact_4C.E.Total),
-                                                                   "2°C Socioeconomic" = sum(Impact_2C.S.Total),
-                                                                   "4°C Socioeconomic" = sum(Impact_4C.S.Total))
+record_score <- sp_country %>% group_by(total_score) %>% summarise("2°C Non-native ant richness" = sum(proj_diff_2C),
+                                                                   "4°C Non-native ant richness" = sum(proj_diff_4C),
+                                                                   "2°C Harmful ant richness" = sum(proj_diff_2C[Harmful == "Harmful"]),
+                                                                   "4°C Harmful ant richness" = sum(proj_diff_4C[Harmful=="Harmful"]),
+                                                                   "2°C Environmental impact" = sum(Impact_2C.E.Total),
+                                                                   "4°C Environmental impact" = sum(Impact_4C.E.Total),
+                                                                   "2°C Socioeconomic impact" = sum(Impact_2C.S.Total),
+                                                                   "4°C Socioeconomic impact" = sum(Impact_4C.S.Total))
 
 record_score <- record_score %>% pivot_longer(!total_score)
-na.omit(record_score) %>% group_by(name) %>% summarize(percent = value[total_score==5]/sum(value)*100)
+na.omit(record_score) %>% group_by(name) %>% summarize(percent = value[total_score==5]/sum(value)*100) # impacts in countries with tl 5 scores
 
-record_score$name <- factor(record_score$name,levels=c("2°C Non-native","4°C Non-native", "2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic"))
+record_score$name <- factor(record_score$name,levels=c("2°C Non-native ant richness",
+                                                       "4°C Non-native ant richness", 
+                                                       "2°C Harmful ant richness",
+                                                       "4°C Harmful ant richness",
+                                                       "2°C Environmental impact",
+                                                       "4°C Environmental impact",
+                                                       "2°C Socioeconomic impact",
+                                                       "4°C Socioeconomic impact"))
 
 ### Make Fig3
 p3 <- ggplot(data=record_score)+
@@ -152,14 +159,14 @@ plot(p3)
 ggsave("Figures/Score_and_impact.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
 
 ### Make FigS5 (Country level variations - given the same response capacities)
-country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% summarise("2°C Non-native" = sum(proj_diff_2C),
-                                                                           "4°C Non-native" = sum(proj_diff_4C),
-                                                                           "2°C Harmful" = sum(proj_diff_2C[Harmful == "Harmful"]),
-                                                                           "4°C Harmful" = sum(proj_diff_4C[Harmful=="Harmful"]),
-                                                                           "2°C Environmental" = sum(Impact_2C.E.Total),
-                                                                           "4°C Environmental" = sum(Impact_4C.E.Total),
-                                                                           "2°C Socioeconomic" = sum(Impact_2C.S.Total),
-                                                                           "4°C Socioeconomic" = sum(Impact_4C.S.Total))
+country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% summarise("2°C Non-native ant richness" = sum(proj_diff_2C),
+                                                                           "4°C Non-native ant richness" = sum(proj_diff_4C),
+                                                                           "2°C Harmful ant richness" = sum(proj_diff_2C[Harmful == "Harmful"]),
+                                                                           "4°C Harmful ant richness" = sum(proj_diff_4C[Harmful=="Harmful"]),
+                                                                           "2°C Environmental impact" = sum(Impact_2C.E.Total),
+                                                                           "4°C Environmental impact" = sum(Impact_4C.E.Total),
+                                                                           "2°C Socioeconomic impact" = sum(Impact_2C.S.Total),
+                                                                           "4°C Socioeconomic impact" = sum(Impact_4C.S.Total))
 
 sum_stat <- country_record_score %>% group_by(total_score) %>% summarise(n= n(),
                                                                    mean_2C_alien = mean(`2°C Non-native`),
@@ -182,7 +189,14 @@ sum_stat <- country_record_score %>% group_by(total_score) %>% summarise(n= n(),
 
 
 country_record_score_long <- na.omit(country_record_score) %>% pivot_longer(cols=-c(Final_country,total_score),names_to="scenario")
-country_record_score_long$scenario <- factor(country_record_score_long$scenario,levels=c("2°C Non-native","4°C Non-native", "2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic"))
+country_record_score_long$scenario <- factor(country_record_score_long$scenario,levels=c("2°C Non-native ant richness",
+                                                                                         "4°C Non-native ant richness", 
+                                                                                         "2°C Harmful ant richness",
+                                                                                         "4°C Harmful ant richness",
+                                                                                         "2°C Environmental impact",
+                                                                                         "4°C Environmental impact",
+                                                                                         "2°C Socioeconomic impact",
+                                                                                         "4°C Socioeconomic impact"))
 
 pS5 <- ggplot(data=country_record_score_long)+
   geom_boxplot(aes(x=total_score,y=value,group=total_score))+
@@ -239,13 +253,26 @@ for (num in 1:8){
                                        xlab("")+
                                        labs(fill="Score")+
                                        scale_fill_manual(values=c("#bd0026","#fd8d3c","#ffffb2"))+
-                                       ggtitle(var[[num]])+
+                                       ggtitle("")+
                                        theme_classic()+
                                        theme(axis.text.x = if(num==1){element_text(angle = 10,size=7)}else{element_text(angle=10,colour = "white",size=8)},
                                              axis.text.y = element_text(size=5.5)))
   }
 
-p4 <- ggarrange(p_cap_1,p_cap_2,p_cap_3,p_cap_4,p_cap_5,p_cap_6,p_cap_7,p_cap_8,nrow=4,ncol=2,common.legend=T,legend="bottom")
+p4 <- ggarrange(p_cap_1,p_cap_2,p_cap_3,p_cap_4,p_cap_5,p_cap_6,p_cap_7,p_cap_8,
+                labels = c("2°C Non-native ant richness",
+                           "4°C Non-native ant richness",
+                           "2°C Harmful ant richness",
+                           "4°C Harmful ant richness",
+                           "2°C Environmental impact",
+                           "4°C Environmental impact",
+                           "2°C Socioeconomic impact",
+                           "4°C Socioeconomic impact"),
+                hjust=-0.2,
+                vjust=0,
+                label.y=0.9,
+                font.label=list(size=12),
+                nrow=4,ncol=2,common.legend=T,legend="bottom")
 plot(p4)
 
 ggsave("Figures/Fig4.tiff",dpi=800,width=16.8,height=24,units="cm",compression="lzw",bg="white")

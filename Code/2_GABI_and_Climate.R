@@ -49,6 +49,13 @@ set <- exotic.records %>%
 unique(set$valid_species_name)
 sum(set$diff < 0,na.rm=T) #number of indoor records precede the earliest outdoor records
 
+### the latest year of each regional occurrence
+
+latest_record <- exotic.records %>% 
+  filter(Improved.Classification == "Exotic" | Improved.Classification == "Indoor Introduced") %>% 
+  group_by(valid_species_name,bentity2_name,Improved.Classification) %>% 
+  summarize(latest=max(Date))
+
 ### The number of indoor and outdoor records for each species
 status_count <- exotic.records %>% group_by(valid_species_name) %>% dplyr::count(Improved.Classification)
 status_count_wide <- status_count %>% pivot_wider(id_cols=valid_species_name,names_from=Improved.Classification,values_from=n)
@@ -84,6 +91,7 @@ overall.exotic <- NULL
 na.species <- NULL
 
 set <- terra::extract(clim,bentity.shp,fun=mean,na.rm=T) #get mean climatic conditinos for each polygon
+
 set <- cbind(set,bentity2_name=bentity.shp$BENTITY2_N)
 set$area <- expanse(bentity.shp) #extract area - useful for faster calculations later (instead of averaging across all grids, first calculat menas of each polygon, then weighted avg based on area of each poylgon)
 
@@ -100,6 +108,7 @@ subset.exotic <- cbind(subset.exotic,centroid_df[match(subset.exotic$bentity2_na
 ### Note that instead of extracting climatic data from each grid for each species, we simply used polygon-level climate (based on averaging across grids) in the loop.
 ### These data have been extracted in L80-82
 ### This makes the script much more computationally effect (extracting grid-level data for 336 speceis is very slow!!)
+tl_records <- subset.exotic %>% group_by(bentity2_name,num) %>% summarize(n=n()) 
 
 for (sp in sp.list) {
   message("Analyzing ",sp,"; ",which(sp.list %in% sp),"/",length(sp.list))
@@ -108,8 +117,9 @@ for (sp in sp.list) {
   sp.records.exotic <- subset(subset.exotic, valid_species_name==sp)
   
   sp.records.native <- sp.records.native[!duplicated(sp.records.native$bentity2_name),]
+  sp.records.last.update <- sp.records.exotic %>% group_by(bentity2_name)  %>% summarize(last_update=max(Date,na.rm=T))
   sp.records.exotic <- sp.records.exotic %>% group_by(bentity2_name)  %>% arrange(Date) %>% mutate(num1=mean(num)) %>% slice(1L)
-  
+
   native.clim.df <- set[match(sp.records.native$bentity2_name,set$bentity2_name),]
   exotic.clim.df <- set[match(sp.records.exotic$bentity2_name,set$bentity2_name),]
   
@@ -117,14 +127,29 @@ for (sp in sp.list) {
                                                      mean_temp_pca_native = weighted.mean(temp_pca,w=area,na.rm=T),
                                                      mean_water_pca_native = weighted.mean(water_pca,w=area,na.rm=T))
   
-  clim_invasion_df[[sp]] <- data.frame(genus=word(sp,1,1,"\\."),species=sp,polygon_name=unique(sp.records.exotic$bentity2_name),
+  clim_invasion_df[[sp]] <- data.frame(genus=word(sp,1,1,"\\."),
+                                       species=sp,
+                                       polygon_name=unique(sp.records.exotic$bentity2_name),
                                        x= unique(sp.records.exotic$x),
                                        y = unique(sp.records.exotic$y),
-                                       num=sp.records.exotic$num1,exotic.clim.df,date=sp.records.exotic$Date,
+                                       num=sp.records.exotic$num1,
+                                       exotic.clim.df,
+                                       date=sp.records.exotic$Date,
+                                       last_update = sp.records.last.update$last_update,
                                        sp.layer=layer$strata_classified,native.climatic.niche)
 }
 
 clim_invasion_df <- do.call(rbind,clim_invasion_df)
+clim_invasion_df <- clim_invasion_df %>% 
+  left_join(tl_records[tl_records$num==0,c("bentity2_name","n")],by=join_by(bentity2_name)) %>%
+  left_join(tl_records[tl_records$num==1,c("bentity2_name","n")],by=join_by(bentity2_name)) %>%
+  as.data.frame()
+
+colnames(clim_invasion_df)[(21:22)] <- c("n.indoor","n.outdoor")
+
+clim_invasion_df$n.indoor <- replace_na(clim_invasion_df$n.indoor,0)
+clim_invasion_df$n.outdoor <- replace_na(clim_invasion_df$n.outdoor,0)
+
 clim_invasion_df$population <- paste0(clim_invasion_df$bentity2_name,"_",clim_invasion_df$species)
 nrow(na.omit(clim_invasion_df)) #number of populations analyzed (after omitting any records with NA)
 
