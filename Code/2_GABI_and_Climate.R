@@ -2,12 +2,12 @@ require(terra)
 require(tidyverse)
 
 #these files are too large for upload. Please download the terraclimate data and use the clim_raster.R to make them
-temp_pca <- rast("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/Raster/temp_pca.tiff")
-water_pca <- rast("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/Raster/water_pca_untransformed.tiff")
-temp_pca_2C <- rast("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/Raster/temp_pca_2C.tiff")
-temp_pca_4C <- rast("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/Raster/temp_pca_4C.tiff")
-water_pca_2C <- rast("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/Raster/water_pca_2C_untransformed.tiff")
-water_pca_4C <- rast("C:/Users/pakno/OneDrive - University of Toronto/Indoor_ants/Raster/water_pca_4C_untransformed.tiff")
+temp_pca <- rast("Raster/temp_pca.tiff")
+water_pca <- rast("Raster/water_pca_untransformed.tiff")
+temp_pca_2C <- rast("Raster/temp_pca_2C.tiff")
+temp_pca_4C <- rast("Raster/temp_pca_4C.tiff")
+water_pca_2C <- rast("Raster/water_pca_2C_untransformed.tiff")
+water_pca_4C <- rast("Raster/water_pca_4C_untransformed.tiff")
 
 clim <- c(temp_pca,water_pca,temp_pca_2C,temp_pca_4C,water_pca_2C,water_pca_4C)
 

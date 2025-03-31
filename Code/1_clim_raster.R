@@ -1,8 +1,7 @@
 library(terra)
 library(spdep)
-setwd("C:/Users/pakno/OneDrive - University of Toronto/Raster/TerraClim")
-prec <- rast("TerraClimate19812010_ppt.nc") #Download terraclimate
-sm <- rast("TerraClimate19812010_soil.nc")
+prec <- rast("Raster/ClimRast/TerraClimate19812010_ppt.nc") #download the raster yourself before running the script
+sm <- rast("Raster/ClimRast/TerraClimate19812010_soil.nc")
 
 prec_min <- min(prec) #min monthly precipitation 
 prec_max <- max(prec) #max
@@ -92,10 +91,10 @@ writeRaster(final_raster[[6]],"Raster/water_pca_4C.tiff",overwrite=T)
 
 ###check if soil temperature is correlated with air temperature, using data from the database SoilTemp
 library(terra)
-soil_min_surface <- rast("SBIO6_0_5cm_MinT_coldestMonth.tif")
-soil_min_soil <- rast("SBIO6_5_15cm_MinT_coldestMonth.tif")
-soil_max_surface <- rast("SBIO5_0_5cm_MaxT_warmestMonth.tif")
-soil_max_soil <- rast("SBIO5_5_15cm_MaxT_warmestMonth.tif")
+soil_min_surface <- rast("Raster/ClimRast/SBIO6_0_5cm_MinT_coldestMonth.tif")
+soil_min_soil <- rast("Raster/ClimRast/SBIO6_5_15cm_MinT_coldestMonth.tif")
+soil_max_surface <- rast("Raster/ClimRast/SBIO5_0_5cm_MaxT_warmestMonth.tif")
+soil_max_soil <- rast("Raster/ClimRast/SBIO5_5_15cm_MaxT_warmestMonth.tif")
 
 soil_min_surface <- project(soil_min_surface,tmin)
 soil_min_surface <- min(soil_min_surface)
@@ -112,3 +111,28 @@ min_temp_corr <- as.data.frame(c(soil_min_surface,soil_min_soil,AT_min_5km))
 max_temp_corr <- as.data.frame(c(soil_max_surface,soil_max_soil,AT_max_5km))
 cor(na.omit(min_temp_corr))
 cor(na.omit(max_temp_corr))
+
+### check climatic conditinos under all scenarios for table 
+temp <- c(AT_min_5km,AT_min_5km_f,AT_min_5km_f_4C,AT_max_5km,AT_max_5km_f,AT_max_5km_f_4C)
+
+set <- terra::extract(temp,bentity.shp,fun=mean,na.rm=T) #get mean climatic conditinos for each polygon
+set <- na.omit(set)
+sd(set[,3]-set[,2])
+sd(set[,4]-set[,2])
+mean(set[,3]-set[,2])
+mean(set[,4]-set[,2])
+
+sd(set[,6]-set[,5])
+sd(set[,7]-set[,5])
+mean(set[,6]-set[,5])
+mean(set[,7]-set[,5])
+
+diff_min_2 <-AT_min_5km_f-AT_min_5km
+diff_min_4 <- AT_min_5km_f_4C-AT_min_5km
+diff_max_2 <- AT_max_5km_f-AT_max_5km
+diff_max_4 <- AT_max_5km_f_4C-AT_max_5km
+
+global(diff_min_2,"sd",na.rm=T)
+global(diff_min_4,"sd",na.rm=T)
+global(diff_max_2,"sd",na.rm=T)
+global(diff_max_4,"sd",na.rm=T)

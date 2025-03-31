@@ -20,9 +20,12 @@ Otherwise, start from Script 3 and just load the clim_invasion_df.csv
 |3_Indoor_and_Climate.R| Code for GLMM examining how climatic conditions determine indoor status. Also contain codes for Fig1, and all figures about alien and harmful ant richness.
 |4_Impact_analyses.R| Aggregating impact scores from Gruber et al. (2022), and projecting impact increases under climate change. Also contain codes for all figures about the impacts of ants.
 |5_Response_capacity.R| Response capacity analyses using data from Early et al. (2016). Also contain codes for figures about response capacitiy.
-|make_genus_tree.R| add missing genera to the phylogenetic tree obtained from Economo et al. (2018). Used in Script 3 for checking phylogenetic autocorrelation.
+|make_genus_tree.R| Add missing genera to the phylogenetic tree obtained from Economo et al. (2018). Used in Script 3 for checking phylogenetic autocorrelation.
+|eval_georeference.R| Evaluate if it is possible to use geo-referenced records only for the analyses. This is not related to the main results.
 
 # Data
+Note that some of the files are too large and cannot be uploaded to GitHub. This includes the climate rasters from TerraClimate for running 1_clim_raster.R and the Kass et al. (2022) data for running eval_georeference.R. Please visit the source and download the rasters before you run the scripts. However, if you are only interested in reproducing the main results, the data in this repository should be sufficient (which can be reproduced by running script 3, 4, and 5).
+
 |Data|Description|
 |---|---|
 |ant_genus_placement.csv| Genera missing from the backbone phylogenetic tree (Economo et al. 2018). 
