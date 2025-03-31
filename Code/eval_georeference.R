@@ -26,6 +26,7 @@ ant_kass_subset <- subset(ant_kass_subset,native==1)
 
 library(spThin)
 ant_kass_subset_sp_df <- NULL
+set.seed(999)
 for (i in 1:length(unique(ant_kass_subset$valid_species_name))) {
   message(i)
   ant_kass_subset_sp <- subset(ant_kass_subset,valid_species_name == unique(ant_kass_subset$valid_species_name)[[i]])
@@ -54,13 +55,6 @@ ant_kass_subset_sp_df <- cbind(ant_kass_subset_sp_df,climate_georef)
 
 library(tidyverse)
 
-native_dist2 <- ant_kass_subset_sp_df %>%
-  group_by(valid_species_name) %>%
-  summarize(record = n(),
-            n.regions=n_distinct(bentity2_name),
-            PCA1_temp = mean(temp_pca,na.rm=T),
-            PCA1_water = mean(water_pca,na.rm=T))
-    
 native_dist <- native %>% 
   filter(Final == "Yes") %>% 
   group_by(valid_species_name) %>%
@@ -72,96 +66,21 @@ native_dist <- native %>%
   mutate(n.regions.y=replace_na(n.regions.y,0)) %>%
   mutate(prop = n.regions.y/n.regions.x)
 
-PCA_df <- clim_invasion_df %>%
-  group_by(species) %>%
-  summarize(PCA1_temp = mean(temp_pca,na.rm=T),
-            PCA1_water = mean(water_pca,na.rm=T)) %>%
-  left_join(native_dist[,c("valid_species_name","PCA1_temp","PCA1_water","record","prop")],by=join_by(species == valid_species_name))
-
-PCA_df <- subset(PCA_df,record >= 50 & prop >= 0.8)
-
-cor(PCA_df$PCA1_temp.x,PCA_df$PCA1_temp.y,method="kendall")
-cor(PCA_df$PCA1_water.x,PCA_df$PCA1_water.y,method="kendall")
-
-plot(PCA_df$PCA1_temp.x,PCA_df$PCA1_temp.y)
+### Percent of species retained if using geo-referenced records only
+nrow(subset(native_dist,record >= 50 & prop >= 0.8)) / length(unique(clim_invasion_df$species)) * 100
 
 ###
-subset(native_dist,record >= 50 & prop >= 0.8)
-mean(native_dist2$n.regions.x/native_dist2$n.regions.y)
-
-###
-
 clim_invasion_df <- clim_invasion_df %>%
   left_join(PCA_df,by=join_by(species))
 
 clim_invasion_df$num <- ifelse(clim_invasion_df$num ==0,0,1)
-library(glmmTMB)
-m1 <- glmmTMB(num~temp_pca*mean_temp_pca_native+(temp_pca||species)+(mean_temp_pca_native||polygon_name),
-              data=clim_invasion_df,family="binomial") # model does converge. but note the very low random effect variance of temp_pca.
-summary(m1)
+
+clim_invasion_df$record_ratio <- (clim_invasion_df$n.indoor+1)/(clim_invasion_df$n.outdoor+1)
 
 library(glmmTMB)
-m2 <- glmmTMB(num~temp_pca*PCA1_temp.y+(temp_pca||species)+(PCA1_temp.y||polygon_name),
+library(car)
+m2 <- glmmTMB(num~temp_pca*PCA1_temp.y+log(record_ratio)+(temp_pca||species)+(PCA1_temp.y||polygon_name),
               data=clim_invasion_df,family="binomial") # model does converge. but note the very low random effect variance of temp_pca.
 summary(m2)
-
-####
-ant_kass <- read.csv(file.choose())
-ant_kass_clean <- read.csv(file.choose())
-ant_kass_species <- read.csv(file.choose())
-
-native <- subset(native,Final=="Yes")
-ant_kass <- ant_kass[!is.na(ant_kass$dec_long) & !is.na(ant_kass$dec_lat),]
-ant_kass_subset <- ant_kass[ant_kass$valid_species_name %in% unique(clim_invasion_df$species),]
-ant_kass_subset$label <- paste0(ant_kass_subset$valid_species_name,"_",ant_kass_subset$bentity2_name)
-ant_kass_subset$native <- ifelse(ant_kass_subset$label %in% native$label,1,0)
-
-ant_kass_subset <- ant_kass_clean[match(ant_kass_subset$gabi_acc_number,ant_kass_clean$accession_number),]
-
-native_dist2 <- ant_kass_subset %>%
-  filter(native==1) %>%
-  group_by(valid_species_name) %>%
-  count(bentity2_name) %>%
-  mutate(n=1) %>%
-  summarize(n.regions=sum(n))
-
-native_dist <- native %>% 
-  filter(Final == "Yes") %>% 
-  group_by(valid_species_name) %>%
-  count(bentity2_name) %>%
-  summarize(n.regions=sum(n)) %>%
-  left_join(native_dist2,by=join_by(valid_species_name)) %>%
-  mutate(included = valid_species_name %in% unique(clim_invasion_df$species)) %>%
-  filter(included == T) %>%
-  mutate(n.regions.y=replace_na(n.regions.y,0)) %>%
-  mutate(prop = n.regions.y/n.regions.x)
-
-mean(native_dist$prop)
-
-###
-ant_kass_clean <- ant_kass_clean %>%
-  left_join(ant_kass[,c("valid_species_name","gabi_acc_number")],by=join_by(gabi_acc_number))
-
-ant_kass_clean <- ant_kass_clean[!is.na(ant_kass_clean$lon_gabi) & !is.na(ant_kass_clean$lat_gabi),]
-ant_kass_clean <- subset(ant_kass_clean,summary=="True")
-ant_kass_subset <- ant_kass_clean[ant_kass_clean$valid_species_name %in% unique(clim_invasion_df$species),]
-ant_kass_subset$label <- paste0(ant_kass_subset$valid_species_name,"_",ant_kass_subset$bentity2_name)
-ant_kass_subset$native <- ifelse(ant_kass_subset$label %in% native$label,1,0)
-
-native_dist2 <- ant_kass_subset %>%
-  filter(native==1) %>%
-  group_by(valid_species_name) %>%
-  count(bentity2_name) %>%
-  mutate(n=1) %>%
-  summarize(n.regions=sum(n))
-
-native_dist <- native %>% 
-  filter(Final == "Yes") %>% 
-  group_by(valid_species_name) %>%
-  count(bentity2_name) %>%
-  summarize(n.regions=sum(n)) %>%
-  left_join(native_dist2,by=join_by(valid_species_name)) %>%
-  mutate(included = valid_species_name %in% unique(clim_invasion_df$species)) %>%
-  filter(included == T) %>%
-  mutate(n.regions.y=replace_na(n.regions.y,0)) %>%
-  mutate(prop = n.regions.y/n.regions.x)
+Anova(m2)
+performance::r2(m2,tolerance=1e-99)
