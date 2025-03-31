@@ -10,8 +10,7 @@ Note that because of the size of the climatic raster, they were not uploaded to 
 Nevertheless, data extracted from Terraclimate have been provided, and readers can skip script 1 and 2 and directly run the analyses (clim_invasion_df.csv). 
 
 # Code
-Please run these sequentially. If you want to start from the scratch, pick Script 1 (and download Terraclimate rasters, as described in the scripts).
-Otherwise, start from Script 3 and just load the clim_invasion_df.csv
+Please run these scripts sequentially. To start from the scratch, pick Script 1 (and download Terraclimate rasters, as described in the scripts). If you are interested in the main results only, start from Script 3 and just load the clim_invasion_df.csv
 
 |Scripts|Description|
 |---|---|
@@ -24,7 +23,7 @@ Otherwise, start from Script 3 and just load the clim_invasion_df.csv
 |eval_georeference.R| Evaluate if it is possible to use geo-referenced records only for the analyses. This is not related to the main results.
 
 # Data
-Note that some of the files are too large and cannot be uploaded to GitHub. This includes the climate rasters from TerraClimate for running 1_clim_raster.R and the Kass et al. (2022) data for running eval_georeference.R. Please visit the source and download the rasters before you run the scripts. However, if you are only interested in reproducing the main results, the data in this repository should be sufficient (which can be reproduced by running script 3, 4, and 5).
+Some files are too large to be uploaded to GitHub, including the climate rasters from TerraClimate (required for running 1_clim_raster.R) and the Kass et al. (2022) dataset (required for running eval_georeference.R). Please download these files from their respective sources before running the scripts. However, if you are only interested in reproducing the main results, the data available in this repository should be sufficient. You can reproduce the main results by running scripts 3, 4, and 5.
 
 |Data|Description|
 |---|---|
