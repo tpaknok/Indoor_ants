@@ -132,7 +132,6 @@ size <- 2.85
 
 p1e <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E_indoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(e) Environmental",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -144,7 +143,6 @@ plot(p1e)
 
 p1f <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_E_outdoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Environmental",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -156,7 +154,6 @@ plot(p1f)
 
 p1g <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_indoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -167,7 +164,6 @@ p1g <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_indoor))+
 
 p1h <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_outdoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -199,7 +195,6 @@ ggsave("Figures/Current.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3
 
 p2e <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(e) Environmental",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -210,7 +205,6 @@ p2e <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_2C_net))+
 
 p2f <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(f) Environmental",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -221,7 +215,6 @@ p2f <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_E_4C_net))+
 
 p2g <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(g) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -232,7 +225,6 @@ p2g <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_2C_net))+
 
 p2h  <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(h) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -243,7 +235,6 @@ p2h  <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_impact_S_4C_net))+
 
 pS4c <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_E))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(c) Environmental",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -254,7 +245,6 @@ pS4c <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_E))+
 
 pS4d <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_S))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Socioeconomic",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+

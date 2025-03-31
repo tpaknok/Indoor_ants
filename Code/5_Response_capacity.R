@@ -200,7 +200,6 @@ country_record_score_long$scenario <- factor(country_record_score_long$scenario,
 
 pS5 <- ggplot(data=country_record_score_long)+
   geom_boxplot(aes(x=total_score,y=value,group=total_score))+
-  #geom_jitter(aes(x=total_score,y=value),width=0.1)+
   xlab("Total response capacity score (0-5)")+
   ylab("Increases driven by climate change")+
   facet_wrap(~scenario,scales="free",nrow=4,ncol=2)+

@@ -91,44 +91,7 @@ car::Anova(m_simplified_re)
 summary(m_simplified_re)
 performance::r2(m_simplified_re)
 
-# what if no ratio?
-m_no_ratio <- glmmTMB(num~temp_pca*mean_temp_pca_native+(temp_pca||species)+(mean_temp_pca_native||polygon_name),
-             data=NMI_analysis,family="binomial")
-car::Anova(m_no_ratio)
-performance::r2(m_no_ratio) #this one works without reducing tolerance
-
-# subset_df <- subset(NMI_analysis, n.indoor >= 5 & last_update <= 2019 & last_update >= 1958 & (num_original == 0 | num_original == 1))
-# 
-# m_reduced <- glmmTMB(num~scale(temp_pca)*scale(mean_temp_pca_native)+(scale(temp_pca)||species)+(scale(mean_temp_pca_native)||polygon_name),
-#                   data=subset_df,
-#                   family="binomial")
-# summary(m_reduced) #some signs of quasi-separations
-# 
-# plot(DHARMa::simulateResiduals(m_reduced))
-# 
-# 
-# library(blme)
-# subset_df <- subset(NMI_analysis, n.indoor >= 5 & last_update <= 2019 & last_update >= 1958 & (num_original == 0 | num_original == 1))
-# 
-# m_reduced_blme_L1 <- bglmer(num~scale(temp_pca)*scale(mean_temp_pca_native)+(1|species)+(scale(mean_temp_pca_native)||polygon_name),
-#                             data=subset_df,
-#                             family=binomial,
-#                             fixef.prior = normal(cov = diag(9,4)))
-# summary(m_reduced_blme_L1)
-# performance::r2(m_reduced_blme_L1)
-# car::Anova(m_reduced_blme_L1)
-# subset_df <- subset(NMI_analysis, n.indoor >= 10  & last_update <= 2019 & last_update >= 1958 & (num_original == 0 | num_original == 1))
-# 
-# m_reduced_blme_L2 <- bglmer(num~scale(temp_pca)*scale(mean_temp_pca_native)+(1|species)+(scale(mean_temp_pca_native)||polygon_name),
-#                             data=subset_df,
-#                             family=binomial,
-#                             fixef.prior = normal(cov = diag(9,4)))
-# summary(m_reduced_blme_L2)
-# performance::r2(m_reduced_blme_L2)
-# 
-# write.csv(rbind(round(car::Anova(m_reduced_blme_L1),3),round(car::Anova(m_reduced_blme_L2),3),"Results/glmm_sensitivity.csv"))
-
-#see coef, and if there is any sign of quasi-separation...for final model only
+### see coef, and if there is any sign of quasi-separation...for final model only
 m_standardized <- glmmTMB(num~scale(temp_pca)*scale(mean_temp_pca_native)+
                             scale(log(record_ratio))+
                             (scale(temp_pca)||species)+(scale(mean_temp_pca_native)||polygon_name),
@@ -137,84 +100,24 @@ summary(m_standardized)
 
 write.csv(rbind(round(car::Anova(m1),3),round(car::Anova(m1_simplified),3),round(car::Anova(m),3)),"Results/glmm.csv")
 
-# #sensitivity test
+###sensitivity test
 
-library(blme)
 subset_df <- subset(NMI_analysis, last_update >= 1981 & (num_original == 0 | num_original == 1))
 
-m_reduced <- glmmTMB(num~temp_pca*mean_temp_pca_native+log(record_ratio)+(temp_pca||species)+(mean_temp_pca_native||polygon_name),
+m_subset <- glmmTMB(num~temp_pca*mean_temp_pca_native+log(record_ratio)+(temp_pca||species)+(mean_temp_pca_native||polygon_name),
                      data=subset_df,family="binomial")
-summary(m_reduced) 
-car::Anova(m_reduced) 
-performance::r2(m_reduced,tolerance=1e-99) #can't be calculated due to weak RE. remove them
+summary(m_subset) 
+car::Anova(m_subset) 
+performance::r2(m_subset,tolerance=1e-99)
 
 fixef(m)
 fixef(m_reduced) #similar...
 
-m_reduced2 <- glmmTMB(num~temp_pca*mean_temp_pca_native+log(record_ratio)+(temp_pca||species)+(0+mean_temp_pca_native||polygon_name),
+m_subset2 <- glmmTMB(num~temp_pca*mean_temp_pca_native+log(record_ratio)+(temp_pca||species)+(0+mean_temp_pca_native||polygon_name),
                      data=subset_df,family="binomial")
-summary(m_reduced2) 
-car::Anova(m_reduced2) 
-performance::r2(m_reduced2)
-
-# m_reduced <- glmmTMB(num~scale(temp_pca)*scale(mean_temp_pca_native)+scale(log(record_ratio))+(scale(temp_pca)||species)+(scale(mean_temp_pca_native)||polygon_name),
-#                      data=subset_df,family="binomial")
-# summary(m_reduced) #some signs of quasiseparation due to large coefficient...try blmer too?
-# car::Anova(m_reduced) #some signs of quasiseparation 
-
-# library(blme)
-# m_reduced_blme_L1 <- bglmer(num~scale(temp_pca)*scale(mean_temp_pca_native)+scale(log(record_ratio))+(scale(temp_pca)||species)+(scale(mean_temp_pca_native)||polygon_name),
-#                              data=subset_df,
-#                              family=binomial,
-#                              fixef.prior = normal(cov = diag(9,5))) 
-# summary(m_reduced_blme_L1) 
-# 
-# m_reduced_blme_L1 <- bglmer(num~scale(temp_pca)*scale(mean_temp_pca_native)+scale(log(record_ratio))+(scale(temp_pca)||species)+(1|polygon_name),
-#                             data=subset_df,
-#                             family=binomial,
-#                             fixef.prior = normal(cov = diag(9,5)))
-# summary(m_reduced_blme_L1) #still failed to converge
-# 
-# m_reduced_blme_L1 <- bglmer(num~scale(temp_pca)*scale(mean_temp_pca_native)+scale(log(record_ratio))+(1|species)+(1|polygon_name),
-#                             data=subset_df,
-#                             family=binomial,
-#                             fixef.prior = normal(cov = diag(9,5)))
-# summary(m_reduced_blme_L1)
-# performance::r2(m_reduced_blme_L1)
-# car::Anova(m_reduced_blme_L1)
-
-# ### sensitivity testing (removed weak random effects such that performance::r2 runs - other results (e.g. p values) won't change)
-# ### exclude reginos with zero indoor population
-# region_name <- NMI_analysis_sum[NMI_analysis_sum$indoor > 0,"polygon_name"] 
-# m1b <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
-#                data=NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,],family="binomial") #subsetted analysis
-# nrow(NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,])
-# car::Anova(m1b)
-# summary(m1b)
-# performance::r2(m1b)
-# 
-# ### exclude regions with <= 1 indoor population
-# region_name <- NMI_analysis_sum[NMI_analysis_sum$indoor > 1,"polygon_name"]
-# m1c <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
-#                data=NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,],family="binomial") #subsetted analysis
-# nrow(NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,])
-# car::Anova(m1c)
-# summary(m1c)
-# performance::r2(m1c)
-# 
-# ### exclude regions with <= 2 indoor population
-# region_name <- NMI_analysis_sum[NMI_analysis_sum$indoor > 2,"polygon_name"]
-# m1d <- glmmTMB(num~temp_pca*mean_temp_pca_native+(1|species)+(mean_temp_pca_native||polygon_name),
-#                data=NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,],family="binomial") #subsetted analysis
-# nrow(NMI_analysis[NMI_analysis$polygon_name %in% region_name$polygon_name,])
-# summary(m1d)
-# car::Anova(m1d)
-# 
-# performance::r2(m1d)
-# 
-# write.csv(rbind(round(car::Anova(m1b),3),
-#                 round(car::Anova(m1c),3),
-#                 round(car::Anova(m1d),3)),"Results/glmm_additional.csv")
+summary(m_subset2) 
+car::Anova(m_subset2) 
+performance::r2(m_subset2)
 
 ### Check spatial autocorrelations
 library(DHARMa)
@@ -299,7 +202,7 @@ colnames(predict_df)[1:2] <- c("temp_pca","water_pca")
 predict_df$record_ratio <- 1
 NMI_analysis$future_status_4C <- predict(m,newdata=predict_df, type="response")
 
-#############
+### Impact analyses - preparing the data
 backup_NMI_analysis <- NMI_analysis
 GISS <- read.csv("Data/GISS.csv")
 GISS <- GISS[GISS$Health_type != "Indoor (Occurrence)" & GISS$Health_type != "Indoor (Pathogen)" & GISS$Health_type != "Outdoor (Occurrence)" & GISS$Health_type != "Outdoor (Pathogen)",]
@@ -328,7 +231,6 @@ sum(pos) #species found in GABI dataset
 
 not_considered_sp <- unique(GISS_considered$Species.name)[!pos] 
 
-### actual analyses
 GISS_long <- GISS %>% 
   select(Species.name,Plants_score,Animals_score,Competition_score,Ecosystems_score,Diseases_score,Hybridization_score,Crops_score,Animal.production_score,Forestry_score,Infrastructure_score,Health_score,Social_score,
          Plants_Confidence_level,Animals_Confidence_level,Competition_Confidence_level,Ecosystems_Confidence_level,Diseases_Confidence_level,Hybridization_Confidence_level,Crops_Confidence_level,Animal.production_Confidence_level,Forestry_Confidence_level,Infrastructure_Confidence_level,Health_Confidence_level,Social_Confidence_level) %>%
@@ -358,7 +260,6 @@ apply(not_considered_harmful[,2:3],2,mean)
 apply(not_considered_harmful[,2:3],2,max)
 
 ###
-
 NMI_analysis$Harmful <- ifelse(gsub("\\."," ",NMI_analysis$species) %in% Harmful$Species.name,"Harmful","Alien")
 NMI_analysis$species[NMI_analysis$Harmful == "Harmful" & NMI_analysis$num == 0]
 unique(NMI_analysis$species[NMI_analysis$Harmful == "Harmful" & NMI_analysis$num == 0])
@@ -505,7 +406,6 @@ theme <- theme(axis.line=element_blank(),
 max_outdoor <- max(bentity.shp.sf$n.outdoor,na.rm=T)
 pn1_indoor <- ggplot(data=bentity.shp.sf,aes(fill=n.indoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Number of indoor records",size=1.5)+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
@@ -514,7 +414,6 @@ pn1_indoor <- ggplot(data=bentity.shp.sf,aes(fill=n.indoor))+
 
 pn1_outdoor <- ggplot(data=bentity.shp.sf,aes(fill=n.outdoor))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Number of outdoor records",size=1.5)+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
@@ -531,7 +430,7 @@ pn1 <- ggarrange(pn1_indoor,pn1_outdoor,
                  font.label=list(size=8)
                  )
 
-ggsave("Figures/pn.tiff",pn1,dpi=600,width=12,height=12,compression="lzw",units="cm",bg="white")
+ggsave("Figures/indoor_outdoor_record.tiff",pn1,dpi=600,width=12,height=12,compression="lzw",units="cm",bg="white")
 
 ###Fig2a-d
 xmax <- xmin <- -1.4e07
@@ -563,7 +462,6 @@ theme <- theme(axis.line=element_blank(),
 
 p1a <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)+
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -575,7 +473,6 @@ plot(p1a)
 
 p1b <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Non-native",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -585,7 +482,6 @@ p1b <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr))+
 
 p1c <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr.Harmful))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(c) Harmful",size=size)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
@@ -624,7 +520,6 @@ space <- 900000
 size <- 2.85
 p2a <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -636,7 +531,6 @@ plot(p2a)
 
 p2b <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Non-native",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -648,7 +542,6 @@ plot(p2b)
 
 p2c <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_2C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(c) Harmful",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -659,7 +552,6 @@ p2c <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_2C_net))+
 
 p2d <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_4C_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Harmful",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -671,7 +563,6 @@ p2d <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_4C_net))+
 ###Fig S4a-b
 pS4a <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_indoor_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(a) Non-native",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -683,7 +574,6 @@ plot(pS4a)
 
 pS4b <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_Harmful_indoor_net))+
   geom_sf(colour="black",linewidth=0.1)+
-  #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b) Harmful",size=size)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
@@ -711,7 +601,7 @@ p_pc <- ggplot(data=density_plot,aes(x=Projected_change))+
   theme_bw()
 
 plot(p_pc)
-ggsave("Figures/pc.tiff",dpi=600,width=12,height=12,compression="lzw",units="cm",bg="white")
+ggsave("Figures/Reg_occ_nat_prob.tiff",dpi=600,width=12,height=12,compression="lzw",units="cm",bg="white")
 
 density_plot <- rbind(as.matrix(cbind(NMI_analysis[,c("future_status_2C","num")],"2°C")),
                       as.matrix(cbind(NMI_analysis[,c("future_status_4C","num")],"4°C")),
