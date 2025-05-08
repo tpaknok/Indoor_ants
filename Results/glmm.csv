@@ -10,7 +10,7 @@
 "temp_pca:mean_temp_pca_native",12.209,1,0
 "water_pca1",2.369,1,0.124
 "mean_water_pca_native1",0.115,1,0.735
-"temp_pca1",36.921,1,0
+"temp_pca1",36.922,1,0
 "mean_temp_pca_native1",10.529,1,0.001
 "log(date)1",1.629,1,0.202
 "sp.layer1",4.745,5,0.448

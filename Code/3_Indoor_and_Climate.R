@@ -7,6 +7,7 @@ library(tidyverse)
 library(terra)
 library(performance)
 library(sf)
+library(viridis)
 bentity.shp <- vect("Data/Bentity2_shapefile_fullres.shp")
 clim_invasion_df <- read.csv("Data/clim_invasion_df.csv")
 
@@ -111,7 +112,6 @@ car::Anova(m_subset)
 performance::r2(m_subset,tolerance=1e-99)
 
 fixef(m)
-fixef(m_reduced) #similar...
 
 m_subset2 <- glmmTMB(num~temp_pca*mean_temp_pca_native+log(record_ratio)+(temp_pca||species)+(0+mean_temp_pca_native||polygon_name),
                      data=subset_df,family="binomial")
@@ -174,13 +174,13 @@ p1<- ggplot(predict_niche,aes(y=group,x=x))+
   #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(b)",size=3)+
   xlab("Temperature PCA1 of introduced region \n (Colder and more seasonal)")+
   ylab("Temperature PCA1 of native range \n (Colder and more seasonal)")+
-  scale_fill_continuous(low="#ffffb2",high="#e31a1c",name="Predicted naturalization probability",limits=c(0,1),breaks=c(0,0.25,0.5,0.75,1))+
+  scale_fill_viridis(name="Projected climatic suitability",limits=c(0,1),breaks=c(0,0.25,0.5,0.75,1))+
   scale_color_manual(values=c("grey60","black"),name="")+
   theme+
   guides(fill=guide_colourbar(title.position="top"),
         colour=guide_legend(title.position="top",
                             override.aes = list(size = 5)))
-plot(p1)
+  plot(p1)
 
 ggsave("Figures/Model_results.tiff",dpi=800,height=8.4,width=10.4,units="cm",compression="lzw",bg="white")
 
@@ -288,8 +288,9 @@ site_summary <- NMI_analysis %>% group_by(polygon_name,ID) %>% summarize(current
                                                                          current_projection_sum = sum(current_status_projection),
                                                                          future_sum_2C=sum(future_status_2C),
                                                                          future_sum_4C=sum(future_status_4C),
-                                                                         future_indoor_gain_2C = sum(future_status_2C[num==0]),
-                                                                         future_indoor_gain_4C = sum(future_status_4C[num==0]),
+                                                                         current_projection_indoor_sum = sum(current_status_projection[num==0]),
+                                                                         future_indoor_sum_2C = sum(future_status_2C[num==0]),
+                                                                         future_indoor_sum_4C = sum(future_status_4C[num==0]),
                                                                          proj_diff_2C_net = sum(proj_diff_2C),
                                                                          proj_diff_4C_net = sum(proj_diff_4C),
                                                                          proj_diff_indoor_2C_net = sum(proj_diff_2C[num==0]),
@@ -300,18 +301,19 @@ site_summary <- NMI_analysis %>% group_by(polygon_name,ID) %>% summarize(current
                                                                          current_projection_Harmful_sum = sum(current_status_projection[Harmful=="Harmful"]),
                                                                          future_sum_Harmful_2C=sum(future_status_2C[Harmful=="Harmful"]),
                                                                          future_sum_Harmful_4C=sum(future_status_4C[Harmful=="Harmful"]),
-                                                                         future_Harmful_indoor_gain_2C = sum(future_status_2C[Harmful=="Harmful" & num==0]),
-                                                                         future_Harmful_indoor_gain_4C = sum(future_status_4C[Harmful=="Harmful" & num==0]),
+                                                                         current_projection_indoor_Harmful_sum = sum(current_status_projection[Harmful=="Harmful" & num == 0]),
+                                                                         future_Harmful_indoor_sum_2C = sum(future_status_2C[Harmful=="Harmful" & num==0]),
+                                                                         future_Harmful_indoor_sum_4C = sum(future_status_4C[Harmful=="Harmful" & num==0]),
                                                                          proj_diff_Harmful_2C_net = sum(proj_diff_2C[Harmful=="Harmful"]),
                                                                          proj_diff_Harmful_4C_net = sum(proj_diff_4C[Harmful=="Harmful"]),
                                                                          proj_diff_Harmful_indoor_2C_net = sum(proj_diff_2C[Harmful=="Harmful" & num==0]),
                                                                          proj_diff_Harmful_indoor_4C_net = sum(proj_diff_4C[Harmful=="Harmful" & num==0]),
                                                                          warming_diff_Harmful_net = sum(warming_diff[Harmful=="Harmful"]),
                                                                          warming_diff_Harmful_indoor_net = sum(warming_diff[num==0 & Harmful=="Harmful"]),
-                                                                         Percent_2C = proj_diff_indoor_2C_net/current_sum*100,
-                                                                         Percent_4C = proj_diff_indoor_4C_net/current_sum*100,
-                                                                         Percent_2C_Harmful = proj_diff_Harmful_indoor_2C_net/current_sum*100,
-                                                                         Percent_4C_Harmful = proj_diff_Harmful_indoor_4C_net/current_sum*100)
+                                                                         Percent_2C = proj_diff_indoor_2C_net/current_projection_sum*100,
+                                                                         Percent_4C = proj_diff_indoor_4C_net/current_projection_sum*100,
+                                                                         Percent_2C_Harmful = proj_diff_Harmful_indoor_2C_net/current_projection_Harmful_sum*100,
+                                                                         Percent_4C_Harmful = proj_diff_Harmful_indoor_4C_net/current_projection_Harmful_sum*100)
 empty_poly <- data.frame(polygon_name=bentity.shp.df[!bentity.shp.df$BENTITY2_N %in% site_summary$polygon_name,"BENTITY2_N"],
            ID = rownames(bentity.shp.df[!bentity.shp.df$BENTITY2_N %in% site_summary$polygon_name,]))
 
@@ -323,8 +325,8 @@ site_summary[is.na(site_summary)] <- 0
 
 site_summary %>% 
   filter(current_indoor >0) %>% 
-  summarise(percent_2C = mean(proj_diff_indoor_2C_net)/mean(current_sum)*100,
-            percent_4C = mean(proj_diff_indoor_4C_net)/mean(current_sum)*100,
+  summarise(percent_2C = mean(proj_diff_indoor_2C_net)/mean(current_projection_sum)*100,
+            percent_4C = mean(proj_diff_indoor_4C_net)/mean(current_projection_sum)*100,
             gain_2C = mean(proj_diff_indoor_2C_net),
             gain_4C = mean(proj_diff_indoor_4C_net),
             gain_2C_min = min(proj_diff_indoor_2C_net),
@@ -334,8 +336,8 @@ site_summary %>%
 
 site_summary %>% 
   filter(current_indoor_Harmful >0) %>% 
-  summarise(percent_2C_Harmful = mean(proj_diff_Harmful_indoor_2C_net)/mean(current_Harmful)*100,
-            percent_4C_Harmful = mean(proj_diff_Harmful_indoor_4C_net)/mean(current_Harmful)*100,
+  summarise(percent_2C_Harmful = mean(proj_diff_Harmful_indoor_2C_net)/mean(current_projection_Harmful_sum)*100,
+            percent_4C_Harmful = mean(proj_diff_Harmful_indoor_4C_net)/mean(current_projection_Harmful_sum)*100,
             gain_2C_Harmful = mean(proj_diff_Harmful_indoor_2C_net),
             gain_4C_Harmful = mean(proj_diff_Harmful_indoor_4C_net),
             gain_2C_Harmful_min = min(proj_diff_Harmful_indoor_2C_net),
@@ -405,19 +407,19 @@ theme <- theme(axis.line=element_blank(),
 
 max_outdoor <- max(bentity.shp.sf$n.outdoor,na.rm=T)
 pn1_indoor <- ggplot(data=bentity.shp.sf,aes(fill=n.indoor))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",trans="log10",limits=c(1,max_outdoor))+ #0 become 
+  scale_fill_viridis(na.value="grey40",trans="log10",limits=c(1,max_outdoor))+ #0 become 
   theme
 
 pn1_outdoor <- ggplot(data=bentity.shp.sf,aes(fill=n.outdoor))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",trans="log10")+
+  scale_fill_viridis(na.value="grey40",trans="log10")+
   theme
 
 library(ggpubr)
@@ -461,45 +463,51 @@ theme <- theme(axis.line=element_blank(),
                legend.justification = c("right", "top"))
 
 p1a <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)+
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,68),breaks=c(1,23,46,68))+
+  scale_fill_viridis(na.value="grey40",limits=c(1,68),breaks=c(1,23,46,68))+
   theme
 
 plot(p1a)
 
 p1b <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,68),breaks=c(1,23,46,68))+
+  scale_fill_viridis(na.value="grey40",limits=c(1,68),breaks=c(1,23,46,68))+
   theme
 
 p1c <- ggplot(data=bentity.shp.sf,aes(fill=indoor.sr.Harmful))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotation_custom(g1, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,17),breaks=c(1,6,11,17))+
+  scale_fill_viridis(na.value="grey40",limits=c(1,17),breaks=c(1,6,11,17))+
   theme
 plot(p1c)
 
 p1d <- ggplot(data=bentity.shp.sf,aes(fill=outdoor.sr.Harmful))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   #annotate("text", x = -Inf, y = Inf, hjust=0,vjust=1,label = "(d) Harmful",size=size)+
   annotation_custom(g2, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(1,17),breaks=c(1,6,11,17))+
+  scale_fill_viridis(na.value="grey40",limits=c(1,17),breaks=c(1,6,11,17))+
   theme
 
+bentity.shp.sf$proj_indoor_Current_total <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"current_projection_indoor_sum"]
+bentity.shp.sf$proj_indoor_2C_total <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"future_indoor_sum_2C"]
+bentity.shp.sf$proj_indoor_4C_total <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"future_indoor_sum_4C"]
+bentity.shp.sf$proj_Harmful_indoor_Current_total <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"current_projection_indoor_Harmful_sum"]
+bentity.shp.sf$proj_Harmful_indoor_2C_total <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"future_Harmful_indoor_sum_2C"]
+bentity.shp.sf$proj_Harmful_indoor_4C_total <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"future_Harmful_indoor_sum_4C"]
 bentity.shp.sf$proj_diff_indoor_2C_net <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"proj_diff_indoor_2C_net"]
 bentity.shp.sf$proj_diff_indoor_4C_net<- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"proj_diff_indoor_4C_net"]
 bentity.shp.sf$proj_diff_Harmful_indoor_2C_net <- site_summary[match(bentity.shp.sf$BENTITY2_N,site_summary$polygon_name),"proj_diff_Harmful_indoor_2C_net"]
@@ -519,67 +527,67 @@ ymin <- ymax <- -5250000
 space <- 900000
 size <- 2.85
 p2a <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_2C_net))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,3.8),breaks = c(0,1.9,3.8))+
+  scale_fill_viridis(na.value="grey40",limits=c(0,3.8),breaks = c(0,1.9,3.8))+
   theme
 plot(p2a)
 
 p2b <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_indoor_4C_net))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,3.8),breaks = c(0,1.9,3.8))+
+  scale_fill_viridis(na.value="grey40",limits=c(0,3.8),breaks = c(0,1.9,3.8))+
   theme
 plot(p2b)
 
 p2c <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_2C_net))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotate("text", x = xmin+space, y = ymin+space,label = "2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,1.1),breaks = c(0,0.5,1.1))+
+  scale_fill_viridis(na.value="grey40",limits=c(0,1.1),breaks = c(0,0.5,1.1))+
   theme
 
 p2d <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_4C_net))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,1.1),breaks = c(0,0.5,1.1))+
+  scale_fill_viridis(na.value="grey40",limits=c(0,1.1),breaks = c(0,0.5,1.1))+
   theme
 
 ###Fig S4a-b
 pS4a <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_indoor_net))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,2.6),breaks = c(0,1.3,2.6))+
+  scale_fill_viridis(na.value="grey40",limits=c(0,2.6),breaks = c(0,1.3,2.6))+
   theme
 plot(pS4a)
 
 pS4b <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_Harmful_indoor_net))+
-  geom_sf(colour="black",linewidth=0.1)+
+  geom_sf(colour="white",linewidth=0.1)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+
   annotation_custom(g3, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax) +
   labs(fill="")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white",limits=c(0,0.7),breaks = c(0,0.3,0.7))+
+  scale_fill_viridis(na.value="grey40",limits=c(0,0.7),breaks = c(0,0.3,0.7))+
   theme
 plot(pS4b)
 
@@ -597,7 +605,7 @@ library(ggh4x)
 p_pc <- ggplot(data=density_plot,aes(x=Projected_change))+
   geom_histogram(stat="bin",binwidth=0.025,fill="White",colour="black")+
   facet_grid2(Scenario~class,scale="free_y",independent="y")+
-  labs(x="Changes in naturalization probability",y="Number of regional occurrence")+
+  labs(x="Changes in climatic suitability",y="Number of regional occurrence")+
   theme_bw()
 
 plot(p_pc)
@@ -615,7 +623,7 @@ density_plot$Prob <- as.numeric(density_plot$Prob)
 p_prob <- ggplot(data=density_plot,aes(x=Prob))+
   geom_histogram(stat="bin",binwidth=0.025,fill="White",colour="black")+
   facet_grid2(Scenario~class,scale="free_y",independent="y")+
-  labs(x="Projected naturalization probability",y="Number of regional occurrence")+
+  labs(x="Projected climatic suitability",y="Number of regional occurrence")+
   theme_bw()
 plot(p_prob)  
 ggsave("Figures/prob.tiff",dpi=600,width=12,height=12,compression="lzw",units="cm",bg="white")

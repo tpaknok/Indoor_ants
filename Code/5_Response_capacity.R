@@ -91,11 +91,11 @@ country_sf <- st_wrap_dateline(country_sf)
 country_sf <- st_transform(country_sf,st_crs("ESRI:54019"))
 
 pS6 <- ggplot(data=country_sf,aes(fill=total))+
-  geom_sf(colour="black",size=0.1)+
+  geom_sf(colour="white",size=0.1)+
   labs(fill="Total response capacity score")+
   xlim(-14800000,14800000)+
   ylim(-6500000,9000000)+
-  scale_fill_continuous(low="#ffffb2",high="#bd0026",na.value="white")+
+  scale_fill_viridis(na.value="grey40")+
   theme
 
 plot(pS6)
@@ -117,21 +117,21 @@ NMI_analysis$total_score <- apply(NMI_analysis[,c("threat","IAS_list","Existing_
 length(which(is.na(NMI_analysis$total_score)))
 
 sp_country <- NMI_analysis %>% group_by(species,Final_country,Harmful,total_score) %>% filter(num == 0) %>% summarise(proj_diff_2C = max(proj_diff_2C),
-                                                                                                                       proj_diff_4C = max(proj_diff_4C),
-                                                                                                                       Impact_2C.E.Total = max(Impact_2C.E.Total),
-                                                                                                                       Impact_4C.E.Total = max(Impact_4C.E.Total),
-                                                                                                                       Impact_2C.S.Total = max(Impact_2C.S.Total),
-                                                                                                                       Impact_4C.S.Total = max(Impact_4C.S.Total))
+                                                                                                                      proj_diff_4C = max(proj_diff_4C),
+                                                                                                                      proj_impact_diff_2C.E.Total = max(proj_impact_diff_2C.E.Total),
+                                                                                                                      proj_impact_diff_4C.E.Total = max(proj_impact_diff_4C.E.Total),
+                                                                                                                      proj_impact_diff_2C.S.Total = max(proj_impact_diff_2C.S.Total),
+                                                                                                                      proj_impact_diff_4C.S.Total = max(proj_impact_diff_4C.S.Total))
 
 ### Distribution of climate change effects along different response capacities
 record_score <- sp_country %>% group_by(total_score) %>% summarise("2°C Non-native ant richness" = sum(proj_diff_2C),
                                                                    "4°C Non-native ant richness" = sum(proj_diff_4C),
                                                                    "2°C Harmful ant richness" = sum(proj_diff_2C[Harmful == "Harmful"]),
                                                                    "4°C Harmful ant richness" = sum(proj_diff_4C[Harmful=="Harmful"]),
-                                                                   "2°C Environmental impact" = sum(Impact_2C.E.Total),
-                                                                   "4°C Environmental impact" = sum(Impact_4C.E.Total),
-                                                                   "2°C Socioeconomic impact" = sum(Impact_2C.S.Total),
-                                                                   "4°C Socioeconomic impact" = sum(Impact_4C.S.Total))
+                                                                   "2°C Environmental impact" = sum(proj_impact_diff_2C.E.Total),
+                                                                   "4°C Environmental impact" = sum(proj_impact_diff_4C.E.Total),
+                                                                   "2°C Socioeconomic impact" = sum(proj_impact_diff_2C.S.Total),
+                                                                   "4°C Socioeconomic impact" = sum(proj_impact_diff_4C.S.Total))
 
 record_score <- record_score %>% pivot_longer(!total_score)
 na.omit(record_score) %>% group_by(name) %>% summarize(percent = value[total_score==5]/sum(value)*100) # impacts in countries with tl 5 scores
@@ -163,28 +163,28 @@ country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% s
                                                                            "4°C Non-native ant richness" = sum(proj_diff_4C),
                                                                            "2°C Harmful ant richness" = sum(proj_diff_2C[Harmful == "Harmful"]),
                                                                            "4°C Harmful ant richness" = sum(proj_diff_4C[Harmful=="Harmful"]),
-                                                                           "2°C Environmental impact" = sum(Impact_2C.E.Total),
-                                                                           "4°C Environmental impact" = sum(Impact_4C.E.Total),
-                                                                           "2°C Socioeconomic impact" = sum(Impact_2C.S.Total),
-                                                                           "4°C Socioeconomic impact" = sum(Impact_4C.S.Total))
+                                                                           "2°C Environmental impact" = sum(proj_impact_diff_2C.E.Total),
+                                                                           "4°C Environmental impact" = sum(proj_impact_diff_4C.E.Total),
+                                                                           "2°C Socioeconomic impact" = sum(proj_impact_diff_2C.S.Total),
+                                                                           "4°C Socioeconomic impact" = sum(proj_impact_diff_4C.S.Total))
 
 sum_stat <- country_record_score %>% group_by(total_score) %>% summarise(n= n(),
-                                                                   mean_2C_alien = mean(`2°C Non-native`),
-                                                                   sd_2C_alien = sd(`2°C Non-native`),
-                                                                   mean_4C_alien = mean(`4°C Non-native`),
-                                                                   sd_4C_alien = sd(`4°C Non-native`),
-                                                                   mean_2C_harmful = mean(`2°C Harmful`),
-                                                                   sd_2C_harmful = sd(`2°C Harmful`),
-                                                                   mean_4C_harmful = mean(`4°C Harmful`),
-                                                                   sd_4C_harmful = sd(`4°C Harmful`),
-                                                                   mean_2C_Environmental = mean(`2°C Environmental`),
-                                                                   sd_2C_Environmental = sd(`2°C Environmental`),
-                                                                   mean_2C_Socioeconomic = mean(`2°C Socioeconomic`),
-                                                                   sd_2C_Socioeconomic = sd(`2°C Socioeconomic`),
-                                                                   mean_4C_Environmental = mean(`4°C Environmental`),
-                                                                   sd_4C_Environmental = sd(`4°C Environmental`),
-                                                                   mean_4C_Socioeconomic = mean(`4°C Socioeconomic`),
-                                                                   sd_4C_Socioeconomic = sd(`4°C Socioeconomic`))
+                                                                   mean_2C_alien = mean(`2°C Non-native ant richness`),
+                                                                   sd_2C_alien = sd(`2°C Non-native ant richness`),
+                                                                   mean_4C_alien = mean(`4°C Non-native ant richness`),
+                                                                   sd_4C_alien = sd(`4°C Non-native ant richness`),
+                                                                   mean_2C_harmful = mean(`2°C Harmful ant richness`),
+                                                                   sd_2C_harmful = sd(`2°C Harmful ant richness`),
+                                                                   mean_4C_harmful = mean(`4°C Harmful ant richness`),
+                                                                   sd_4C_harmful = sd(`4°C Harmful ant richness`),
+                                                                   mean_2C_Environmental = mean(`2°C Environmental impact`),
+                                                                   sd_2C_Environmental = sd(`2°C Environmental impact`),
+                                                                   mean_2C_Socioeconomic = mean(`2°C Socioeconomic impact`),
+                                                                   sd_2C_Socioeconomic = sd(`2°C Socioeconomic impact`),
+                                                                   mean_4C_Environmental = mean(`4°C Environmental impact`),
+                                                                   sd_4C_Environmental = sd(`4°C Environmental impact`),
+                                                                   mean_4C_Socioeconomic = mean(`4°C Socioeconomic impact`),
+                                                                   sd_4C_Socioeconomic = sd(`4°C Socioeconomic impact`))
                                                                    
 
 
@@ -214,10 +214,10 @@ country_score <- sp_country %>% group_by(Final_country) %>% summarise("2°C Non-
                                                                       "4°C Non-native" = sum(proj_diff_4C),
                                                                       "2°C Harmful" = sum(proj_diff_2C[Harmful == "Harmful"]),
                                                                       "4°C Harmful" = sum(proj_diff_4C[Harmful=="Harmful"]),
-                                                                      "2°C Environmental" = sum(Impact_2C.E.Total),
-                                                                      "4°C Environmental" = sum(Impact_4C.E.Total),
-                                                                      "2°C Socioeconomic" = sum(Impact_2C.S.Total),
-                                                                      "4°C Socioeconomic" = sum(Impact_4C.S.Total))
+                                                                      "2°C Environmental" = sum(proj_impact_diff_2C.E.Total),
+                                                                      "4°C Environmental" = sum(proj_impact_diff_4C.E.Total),
+                                                                      "2°C Socioeconomic" = sum(proj_impact_diff_2C.S.Total),
+                                                                      "4°C Socioeconomic" = sum(proj_impact_diff_4C.S.Total))
 
 country_score <- cbind(country_score,capacity[match(country_score$Final_country,capacity$Country_global),c("threat","IAS_list","Existing_mgmt","research","outreach")])
 var = c("2°C Non-native","4°C Non-native","2°C Harmful","4°C Harmful","2°C Environmental","4°C Environmental","2°C Socioeconomic","4°C Socioeconomic")
@@ -251,7 +251,7 @@ for (num in 1:8){
                                        ylab("")+
                                        xlab("")+
                                        labs(fill="Score")+
-                                       scale_fill_manual(values=c("#bd0026","#fd8d3c","#ffffb2"))+
+                                       scale_fill_viridis(discrete=T)+
                                        ggtitle("")+
                                        theme_classic()+
                                        theme(axis.text.x = if(num==1){element_text(angle = 10,size=7)}else{element_text(angle=10,colour = "white",size=8)},
