@@ -55,17 +55,23 @@ summary(m_diff)
 
 ###
 m1 <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log(date)+sp.layer+log(record_ratio)+(water_pca+temp_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
-             data=NMI_analysis,family="binomial") # model does converge. but note the very low random effect variance of temp_pca and regions
+             data=NMI_analysis,family="binomial") # This model has convergence issue! Not sure it can be trusted! Let's compare it with other models
 summary(m1)
 car::Anova(m1)
 performance::r2(m1,tolerance=1e-99) #need to reduce tolerance to calculate R2
 
+m1_scaled <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+scale(log(date))+sp.layer+log(record_ratio)+(water_pca+temp_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
+              data=NMI_analysis,family="binomial") # scaled log date to facilitate convergence (log date isn't really in the same scale with the climatic variables)
+summary(m1_scaled) #basically the same result with m1
+performance::r2(m1_scaled,tolerance=1e-99) #similar r2 too
+
 m1a <- glmmTMB(num~water_pca*mean_water_pca_native+temp_pca*mean_temp_pca_native+log(date)+sp.layer+log(record_ratio)+(water_pca||species)+(0+mean_water_pca_native+mean_temp_pca_native||polygon_name),
                data=NMI_analysis,family="binomial") #another option - removing the weakest RE.
 car::Anova(m1a) #minimal change compared to m1
-summary(m1a) #removed one random effect as it is too weak and affect the calculation of R2. 
+summary(m1a) 
 performance::r2(m1a) #similar r2 too 
 
+### these comparisons ensured m1 is robust - for model selection at least (we are not using m1 for the projection).
 ### remove interactions to retest main effect
 m1_simplified <- glmmTMB(num~water_pca+mean_water_pca_native+temp_pca*mean_temp_pca_native+log(date)+sp.layer+log(record_ratio)+(water_pca+temp_pca||species)+(mean_water_pca_native+mean_temp_pca_native||polygon_name),
                data=NMI_analysis,family="binomial") 
@@ -97,7 +103,7 @@ m_standardized <- glmmTMB(num~scale(temp_pca)*scale(mean_temp_pca_native)+
                             scale(log(record_ratio))+
                             (scale(temp_pca)||species)+(scale(mean_temp_pca_native)||polygon_name),
                           data=NMI_analysis,family="binomial")
-summary(m_standardized)
+summary(m_standardized) #looks ok....all estimates are within absolute 10
 
 write.csv(rbind(round(car::Anova(m1),3),round(car::Anova(m1_simplified),3),round(car::Anova(m),3)),"Results/glmm.csv")
 

@@ -110,6 +110,7 @@ subset.exotic <- cbind(subset.exotic,centroid_df[match(subset.exotic$bentity2_na
 ### This makes the script much more computationally effect (extracting grid-level data for 336 speceis is very slow!!)
 tl_records <- subset.exotic %>% group_by(bentity2_name,num) %>% summarize(n=n()) 
 
+#warning doesn't really matter if it is max() and returning inf
 for (sp in sp.list) {
   message("Analyzing ",sp,"; ",which(sp.list %in% sp),"/",length(sp.list))
   layer <- classification[classification$Species.name == sp,]
