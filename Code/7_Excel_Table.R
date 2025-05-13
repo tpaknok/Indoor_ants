@@ -1,7 +1,7 @@
 ### excel file
 
 ### regional sheet
-S11b <- bentity.shp.sf %>%   
+S6a <- bentity.shp.sf %>%   
   as_tibble %>%
   as.data.frame() %>%
   select(Region_name=BENTITY2_N,
@@ -39,11 +39,11 @@ S11b <- bentity.shp.sf %>%
          Projected_soc_SWIS_difference_warm_scen=warming_diff_impact_S,
   )
 
-pos <- which(is.na(S11b$Observed_indoor_richness))
-S11b[pos,c("Projected_harmful_naturalized_richness_indoor_current","Projected_harmful_naturalized_richness_indoor_2C","Projected_harmful_naturalized_richness_indoor_4C")] <- NA
+pos <- which(is.na(S6a$Observed_indoor_richness))
+S6a[pos,c("Projected_naturalized_richness_indoor_current","Projected_naturalized_richness_indoor_2C","Projected_naturalized_richness_indoor_4C")] <- NA
 
-pos <- which(is.na(S11b$Observed_harmful_indoor_richness))
-S11b[pos,c("Projected_harmful_naturalized_richness_indoor_current","Projected_harmful_naturalized_richness_indoor_2C","Projected_harmful_naturalized_richness_indoor_4C")] <- NA
+pos <- which(is.na(S6a$Observed_harmful_indoor_richness))
+S6a[pos,c("Projected_harmful_naturalized_richness_indoor_current","Projected_harmful_naturalized_richness_indoor_2C","Projected_harmful_naturalized_richness_indoor_4C")] <- NA
 
 ### country
 
@@ -68,7 +68,7 @@ sp_country_table <- NMI_analysis %>%
             proj_impact_diff_4C.S.Total = max(proj_impact_diff_4C.S.Total)) %>%
   mutate(max.num = max(num)) #indoor restricted at country levels?
 
-S11a <- sp_country_table %>%   
+S6b <- sp_country_table %>%   
   group_by(Final_country) %>%
   summarize(Observed_indoor_richness=n_distinct(species[max.num==0]), #only consider indoor-restricted species at country levels
             Observed_naturalized_richness=n_distinct(species[max.num==1]),
@@ -106,8 +106,8 @@ S11a <- sp_country_table %>%
   left_join(capacity[,c("Country_global_modified","threat","IAS_list","Existing_mgmt","research","outreach")],by=join_by(Final_country == Country_global_modified)) %>%
   filter(!is.na(Final_country))
 
-write.csv(S11a,"Results/S6a.csv")
-write.csv(S11b,"Results/S6b.csv")
+write.csv(S6a,"Results/S6a.csv")
+write.csv(S6b,"Results/S6b.csv")
 
 ###
  
