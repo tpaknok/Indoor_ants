@@ -80,6 +80,7 @@ Global_impact$Impact <- factor(Global_impact$Impact,levels=c("Plants","Hybridiza
 
 Global_impact$Warming <- factor(Global_impact$Warming,levels=c("4°C","2°C")) 
 
+## Fig S8
 pS2 <- ggplot(Global_impact,aes(label=n,y=Impact,x=Score,fill=Warming))+
   geom_bar(stat="identity",position = 'dodge')+
   geom_text(aes(label=n), position=position_dodge(width=0.9), hjust=-0.25,size=2)+
@@ -185,6 +186,8 @@ p1h <- ggplot(data=bentity.shp.sf,aes(fill=current_impact_S_outdoor))+
   theme
 
 library(ggpubr)
+
+## Fig 1
 p1 <- ggarrange(p1a,p1b,p1c,p1d,p1e,p1f,p1g,p1h,
                 labels = c("(a) Observed non-native ant richness",
                            "(b) Observed non-native ant richness",
@@ -265,6 +268,7 @@ pS4d <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_impact_S))+
   scale_fill_viridis(na.value="grey40",limits=c(0,2.5),breaks=c(0,1.2,2.5))+
   theme
 
+# Fig 3
 p2 <- ggarrange(p2a,p2b,p2c,p2d,p2e,p2f,p2g,p2h,
                 labels = c("(a) Projected non-native ant richness",
                            "(b) Projected non-native ant richness",
@@ -282,7 +286,7 @@ p2 <- ggarrange(p2a,p2b,p2c,p2d,p2e,p2f,p2g,p2h,
 plot(p2)
 ggsave("Figures/Future.tiff",dpi=800,compression="lzw",units="cm",height=13.5/3*4.5,width=16.8,bg="white")
 
-###Species level summary on impactsm and Fig S2
+###Species level summary on impactsm and Fig S8
 Species_summary <- NMI_analysis %>% group_by(species) %>% filter(Harmful == "Harmful" & num == 0)  %>% summarize(increase_2C = sum(proj_diff_2C),
                                                                                                                    increase_4C = sum(proj_diff_4C),
                                                                                                                    Impact_E_2C = sum(projected_Impact_2C.E.Total),
@@ -320,7 +324,7 @@ pS3 <- ggplot(data=Species_summary_long,aes(y=species,x=value,fill=Warming))+
 plot(pS3)
 ggsave("Figures/Species_impact.tiff",dpi=800,compression="lzw",units="cm",height=13.5,width=16.8,bg="white")
 
-###
+### S10
 
 pS4<- ggarrange(pS4a,pS4b,pS4c,pS4d,
                 labels = c("(a) Projected non-native ant richness",

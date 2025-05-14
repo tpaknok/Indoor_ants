@@ -174,6 +174,7 @@ theme <- theme(axis.line=element_line(colour="black"),
                legend.text = element_text(size=7),
                legend.margin=margin(t=0.2,unit="cm"))
 
+# Fig 2.
 p1<- ggplot(predict_niche,aes(y=group,x=x))+
   geom_raster(aes(fill=predicted))+
   geom_point(data=NMI_analysis,aes(y=mean_temp_pca_native,x=temp_pca,colour=Status),size=0.25)+
@@ -428,6 +429,7 @@ pn1_outdoor <- ggplot(data=bentity.shp.sf,aes(fill=n.outdoor))+
   scale_fill_viridis(na.value="grey40",trans="log10")+
   theme
 
+# Fig S1
 library(ggpubr)
 pn1 <- ggarrange(pn1_indoor,pn1_outdoor,
                  labels=c("(a) Number of indoor records","(b) Number of outdoor records"),
@@ -574,7 +576,7 @@ p2d <- ggplot(data=bentity.shp.sf,aes(fill=proj_diff_Harmful_indoor_4C_net))+
   scale_fill_viridis(na.value="grey40",limits=c(0,1.1),breaks = c(0,0.5,1.1))+
   theme
 
-###Fig S4a-b
+###Fig S10a-b
 pS4a <- ggplot(data=bentity.shp.sf,aes(fill=warming_diff_indoor_net))+
   geom_sf(colour="white",linewidth=0.1)+
   annotate("text", x = xmin+space, y = ymin+space,label = "4°C vs 2°C",colour="red",size=size,hjust=0)+

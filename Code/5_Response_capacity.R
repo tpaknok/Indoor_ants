@@ -61,7 +61,7 @@ bentity.shp.df$Final_country[bentity.shp.df$BENTITY2_N == "Lesser Antilles"] <- 
 #slight change here such that different naming between system matches
 country_df$brk_name[country_df$brk_name == "Côte d'Ivoire"] <- "Cote d'Ivoire"
 
-#Make Fig S6, and prepare data for other graphs
+#Make Fig S4, and prepare data for other graphs
 capacity$total <- capacity$threat+capacity$IAS_list+capacity$Existing_mgmt+capacity$research+capacity$outreach
 country_df$total <- capacity[match(country_df$brk_name,capacity$Country_global),"total"]
 country$total <- country_df$total
@@ -145,7 +145,7 @@ record_score$name <- factor(record_score$name,levels=c("2°C Non-native ant rich
                                                        "2°C Socioeconomic impact",
                                                        "4°C Socioeconomic impact"))
 
-### Make Fig3
+### Make S12
 p3 <- ggplot(data=record_score)+
   geom_bar(aes(x=total_score,weight=value))+
   xlab("Total response capcity score (0-5)")+
@@ -158,7 +158,7 @@ p3 <- ggplot(data=record_score)+
 plot(p3)
 ggsave("Figures/Score_and_impact.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
 
-### Make FigS5 (Country level variations - given the same response capacities)
+### Make FigS11 (Country level variations - given the same response capacities)
 country_record_score <- sp_country %>% group_by(total_score,Final_country) %>% summarise("2°C Non-native ant richness" = sum(proj_diff_2C),
                                                                            "4°C Non-native ant richness" = sum(proj_diff_4C),
                                                                            "2°C Harmful ant richness" = sum(proj_diff_2C[Harmful == "Harmful"]),
@@ -209,7 +209,7 @@ pS5 <- ggplot(data=country_record_score_long)+
 plot(pS5)
 ggsave("Figures/Score_and_impact_boxplot.tiff",dpi=800,width=16.8,height=16.8,units="cm",compression="lzw",bg="white")
 
-### figure 4
+### figure S13
 country_score <- sp_country %>% group_by(Final_country) %>% summarise("2°C Non-native" = sum(proj_diff_2C),
                                                                       "4°C Non-native" = sum(proj_diff_4C),
                                                                       "2°C Harmful" = sum(proj_diff_2C[Harmful == "Harmful"]),
@@ -277,7 +277,7 @@ plot(p4)
 ggsave("Figures/Fig4.tiff",dpi=800,width=16.8,height=24,units="cm",compression="lzw",bg="white")
 write.csv(prop_df,"Results/prop.csv")
 
-### Summary statistics Table S5 (% of climate change effects on the top-10 / 20 countries)
+### Summary statistics Table S10 (% of climate change effects on the top-10 / 20 countries)
 sum(country_score$`2°C Non-native`[order(country_score$`2°C Non-native`,decreasing=T)][1:10])/sum(country_score$`2°C Non-native`)
 sum(country_score$`2°C Non-native`[order(country_score$`2°C Non-native`,decreasing=T)][1:20])/sum(country_score$`2°C Non-native`)
 sum(country_score$`4°C Non-native`[order(country_score$`4°C Non-native`,decreasing=T)][1:10])/sum(country_score$`4°C Non-native`)
