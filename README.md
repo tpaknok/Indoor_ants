@@ -22,7 +22,7 @@ Please run these scripts sequentially. To start from the scratch, pick Script 1 
 |6_Socioeconomy.R| Analyzing socioeconomic data at country levels (Fig. S5).
 |7_Excel_Table.R| Preparing Table S6.
 |make_genus_tree.R| Add missing genera to the phylogenetic tree obtained from Economo et al. (2018). Used in Script 3 for checking phylogenetic autocorrelation.
-|eval_georeference.R| Evaluate if it is possible to use geo-referenced records only for the analyses. This is not related to the main results.
+|eval_georeference.R| Evaluate if it is possible to use geo-referenced records only for the analyses. This is not related to the main results. Run this only after running script 3.
 
 # Data
 Some files are too large to be uploaded to GitHub, including the climate rasters from TerraClimate (required for running 1_clim_raster.R) and the Kass et al. (2022) dataset (required for running eval_georeference.R). Please download these files from their respective sources before running the scripts. However, if you are only interested in reproducing the main results, the data available in this repository should be sufficient. You can reproduce the main results by running scripts 3, 4, and 5.
