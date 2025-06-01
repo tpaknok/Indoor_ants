@@ -17,8 +17,11 @@ Please run these scripts sequentially. To start from the scratch, pick Script 1 
 |1_clim_raster.R| Used to process Terraclimate raster and generate PCA scores (based on climatic conditions) across grids globally. 
 |2_GABI_and_Climate| Data cleaning and obtaining climatic conditions in each region, and the native distribution of each species. Also forming the population-level data for analyses. 
 |3_Indoor_and_Climate.R| Code for GLMM examining how climatic conditions determine indoor status. Also contain codes for Fig1, and all figures about alien and harmful ant richness.
+|3.1 georeferenced_native_climatic_niche.R| Results based on georeferenced records only. Run 3_Indoor_and_climate before running this. You can also skip this and run other scripts.
 |4_Impact_analyses.R| Aggregating impact scores from Gruber et al. (2022), and projecting impact increases under climate change. Also contain codes for all figures about the impacts of ants.
 |5_Response_capacity.R| Response capacity analyses using data from Early et al. (2016). Also contain codes for figures about response capacitiy.
+|6_Socioeconomy.R| Analyzing socioeconomic data at country levels (Fig. S5).
+|7_Excel_Table.R| Preparing Table S6.
 |make_genus_tree.R| Add missing genera to the phylogenetic tree obtained from Economo et al. (2018). Used in Script 3 for checking phylogenetic autocorrelation.
 |eval_georeference.R| Evaluate if it is possible to use geo-referenced records only for the analyses. This is not related to the main results.
 
