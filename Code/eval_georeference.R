@@ -55,6 +55,13 @@ ant_kass_subset_sp_df <- cbind(ant_kass_subset_sp_df,climate_georef)
 
 library(tidyverse)
 
+native_dist2 <- ant_kass_subset_sp_df %>%
+  group_by(valid_species_name) %>%
+  summarize(record = n(),
+            n.regions=n_distinct(bentity2_name),
+            PCA1_temp = mean(temp_pca,na.rm=T),
+            PCA1_water = mean(water_pca,na.rm=T))
+
 native_dist <- native %>% 
   filter(Final == "Yes") %>% 
   group_by(valid_species_name) %>%
