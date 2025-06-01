@@ -77,6 +77,14 @@ native_dist <- native %>%
 nrow(subset(native_dist,record >= 50 & prop >= 0.8)) / length(unique(clim_invasion_df$species)) * 100
 
 ###
+
+PCA_df <- NMI_analysis %>%
+  group_by(species) %>%
+  summarize(PCA1_temp = mean(temp_pca,na.rm=T),
+            PCA1_water = mean(water_pca,na.rm=T)) %>%
+  left_join(native_dist[,c("valid_species_name","PCA1_temp","PCA1_water","record","prop")],by=join_by(species == valid_species_name))
+PCA_df <- subset(PCA_df,record >= 50 & prop >= 0.8) #native distribution PCA based on geo-referneced record only. Selecting cases with sufficient records and coverage
+
 clim_invasion_df <- clim_invasion_df %>%
   left_join(PCA_df,by=join_by(species))
 
