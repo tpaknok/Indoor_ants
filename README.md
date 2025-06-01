@@ -17,7 +17,6 @@ Please run these scripts sequentially. To start from the scratch, pick Script 1 
 |1_clim_raster.R| Used to process Terraclimate raster and generate PCA scores (based on climatic conditions) across grids globally. 
 |2_GABI_and_Climate| Data cleaning and obtaining climatic conditions in each region, and the native distribution of each species. Also forming the population-level data for analyses. 
 |3_Indoor_and_Climate.R| Code for GLMM examining how climatic conditions determine indoor status. Also contain codes for Fig1, and all figures about alien and harmful ant richness.
-|3.1 georeferenced_native_climatic_niche.R| Results based on georeferenced records only. Run 3_Indoor_and_climate before running this. You can also skip this and run other scripts.
 |4_Impact_analyses.R| Aggregating impact scores from Gruber et al. (2022), and projecting impact increases under climate change. Also contain codes for all figures about the impacts of ants.
 |5_Response_capacity.R| Response capacity analyses using data from Early et al. (2016). Also contain codes for figures about response capacitiy.
 |6_Socioeconomy.R| Analyzing socioeconomic data at country levels (Fig. S5).
@@ -33,12 +32,14 @@ Some files are too large to be uploaded to GitHub, including the climate rasters
 |ant_genus_placement.csv| Genera missing from the backbone phylogenetic tree (Economo et al. 2018). 
 |backbone_MLtree_RaxML.tre| Backbone tree obtained from (Economo et al. 2018). 
 |Bentity2_shapefile_fullres| 546 spatial polygons (i.e., regions) in the analyses. Also available in AntMaps (https://antmaps.org/)
-|capacity.csv| Response capacity data from Early et al. (2016). Availabe in https://www.fabiogeography.com/data
+|capacity.csv| Response capacity data from Early et al. (2016). Availabe at https://www.fabiogeography.com/data
+|Classification_Mark.csv| Habitat strata data of ants from Wong et al. (2023). 
 |clim_invasion_df.csv| Processed data after script 1 & 2, and ready for statistical analyses (scripts 3-5). 
 |Exotic_record_date.csv| Alien species records from GABI (Guénard et al. 2017). Visit AntMaps (https://antmaps.org/) for the most updated information.
 |GISS.csv| Impact scores of each species obtained from Gruber et al. (2022). We added a column "Health_type" categorizing if the health impacts are only associated with ant attacking people. Non-attack records were excluded from the analyses.
 |match_bentity.csv| Some records are associated with names not mentioned in the Bentity2 system. We used this csv file to re-classify them. 
 |Native.csv| Native distributions of all ants from GABI (Guénard et al. 2017). Visit AntMaps (https://antmaps.org/) for the most updated information.
+|socioeconomy.csv| Data for the socioeconomy analyses at country levels (Fig .S5).
 
 # Figure
 The folder contains all figures included in the manuscript.
